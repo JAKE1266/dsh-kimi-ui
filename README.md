@@ -11,6 +11,12 @@
 
 ---
 
+![浅色预览](assets/preview-light.png)
+![深色预览](assets/preview-dark.png)
+
+> 上图为 **示意图**（由 `node scripts/preview.mjs` 渲染），用于展示配色、圆角与层次，
+> **不是 DSH 真实截图** —— 布局是手写的近似，真实效果请启用插件后查看。
+
 ## v2.0.0：为什么重做
 
 v1.x 严格照搬 Kimi 官方 CSS 的实测值，结果**几乎看不出换了皮肤**：

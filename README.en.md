@@ -9,6 +9,13 @@
 >
 > The plugin changes **only the interface**: no models, no session data, no network, no tools, no file I/O.
 
+![Light preview](assets/preview-light.png)
+![Dark preview](assets/preview-dark.png)
+
+> These are **mockups** rendered by `node scripts/preview.mjs`, not screenshots of
+> DSH. The layout is hand-written and does not reflect the host's real DOM density
+> or spacing; check the live app for the true result.
+
 ## Colors are measured from Kimi's shipped CSS
 
 Every token traces to Kimi's official CSS bundle (`:root` / `:root.dark`):
