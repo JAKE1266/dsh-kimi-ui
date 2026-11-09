@@ -1,0 +1,89 @@
+{
+  "name": "dsh-kimi-ui",
+  "version": "1.0.0",
+  "description": "Kimi 风格皮肤 for DeepSeek Harness Web：深蓝紫渐变主色、深色优先、玻璃质感面板与大圆角几何。纯 CSS 令牌覆盖 + 声明式插槽，零运行时依赖，不碰会话数据。inspired-by，非月之暗面官方。",
+  "type": "module",
+  "main": "lib/index.mjs",
+  "exports": {
+    ".": {
+      "default": "./lib/index.mjs"
+    },
+    "./client": {
+      "default": "./client/client.js"
+    },
+    "./tokens": {
+      "default": "./src/tokens.mjs"
+    },
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "lib",
+    "client",
+    "src",
+    "assets",
+    "cordis.patch.yml",
+    "LICENSE",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node test/run-all.mjs",
+    "prepublishOnly": "node scripts/build.mjs && node test/run-all.mjs"
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "dsh-plugins",
+    "kimi",
+    "moonshot",
+    "theme",
+    "skin",
+    "glassmorphism",
+    "css-variables"
+  ],
+  "author": "JAKE1266 <3051975611@qq.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JAKE1266/dsh-kimi-ui.git"
+  },
+  "homepage": "https://github.com/JAKE1266/dsh-kimi-ui#readme",
+  "bugs": {
+    "url": "https://github.com/JAKE1266/dsh-kimi-ui/issues"
+  },
+  "engines": {
+    "node": ">=20",
+    "dsh": ">=0.2.0-rc.2 <0.3.0-0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-theme",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-brand-official"
+      ]
+    },
+    "catalog": {
+      "category": "theme",
+      "summary": {
+        "zh": "Kimi 风格皮肤：深蓝紫渐变、深色优先、玻璃质感面板与大圆角几何，明暗双主题，附品牌标记与首页快捷入口。",
+        "en": "A Kimi-inspired skin for DSH Web: deep blue-violet gradients, dark-first surfaces, glass panels, large radii, light/dark themes, plus brand marks and hero quick actions."
+      },
+      "capabilities": []
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
