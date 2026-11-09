@@ -23,6 +23,8 @@
     "src",
     "assets",
     "cordis.patch.yml",
+    "scripts",
+    "docs",
     "LICENSE",
     "README.md",
     "README.en.md",
