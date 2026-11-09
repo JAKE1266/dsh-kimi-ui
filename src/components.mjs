@@ -62,26 +62,28 @@ const QUICK_ACTIONS = [
 
 /** 组件层样式，命名空间 .km-*，与皮肤层令牌解耦。 */
 const COMPONENT_CSS = `
-.km-mark{display:block;flex:none;border-radius:32%;user-select:none;-webkit-user-drag:none}
-.km-brand{display:inline-flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;font-weight:600}
-.km-hero-mark{display:block;border-radius:34%;box-shadow:0 8px 24px rgba(23,131,255,.28)}
-.km-quick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;padding:2px 0 0;box-sizing:border-box}
-.km-chip{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 14px;border:1px solid var(--dsw-alias-border-l2,rgba(0,0,0,.12));border-radius:9999px;background:var(--dsw-alias-bg-layer-1,#fff);color:var(--dsw-alias-label-secondary,rgba(0,0,0,.85));font:inherit;font-size:13px;line-height:20px;cursor:pointer;transition:background-color var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1)),border-color var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1)),color var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1)),transform var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1))}
-.km-chip:hover{border-color:var(--km-primary-border,rgba(23,131,255,.4));color:var(--km-primary,#1783FF);background:var(--km-primary-soft,rgba(23,131,255,.1));transform:translateY(-1px)}
+.km-mark{display:block;flex:none;border-radius:32%;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 2px 6px rgba(23,131,255,.30))}
+.km-brand{display:inline-flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.01em;font-weight:700;font-size:15px;background:var(--km-gradient-text,linear-gradient(135deg,#1783FF,#2F20FF));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--km-primary,#1783FF)}
+.km-hero-mark{display:block;border-radius:34%;box-shadow:0 12px 32px rgba(23,131,255,.34),0 0 0 1px rgba(255,255,255,.10) inset;transition:transform var(--km-dur-mid,.22s) var(--km-ease-out,cubic-bezier(0,.0,.2,1))}
+.km-hero-mark:hover{transform:translateY(-2px) scale(1.03)}
+.km-quick{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;width:100%;padding:4px 0 0;box-sizing:border-box}
+.km-chip{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 16px;border:1px solid var(--dsw-alias-border-l2,rgba(0,0,0,.12));border-radius:9999px;background:var(--km-glass-fill,rgba(255,255,255,.78));backdrop-filter:var(--km-glass-blur,blur(20px) saturate(180%));-webkit-backdrop-filter:var(--km-glass-blur,blur(20px) saturate(180%));color:var(--dsw-alias-label-secondary,rgba(0,0,0,.85));font:inherit;font-size:13px;font-weight:500;line-height:20px;cursor:pointer;transition:all var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1))}
+.km-chip:hover{border-color:var(--km-primary-border,rgba(23,131,255,.32));color:var(--km-primary,#1783FF);background:var(--km-primary-soft,rgba(23,131,255,.1));transform:translateY(-1px);box-shadow:0 4px 12px var(--km-primary-softer,rgba(23,131,255,.06))}
 .km-chip:active{transform:translateY(0)}
 .km-chip:focus-visible{outline:2px solid var(--dsw-focus-ring-color,#1783FF);outline-offset:2px}
-.km-about{max-width:760px;display:flex;flex-direction:column;gap:18px;color:var(--dsw-alias-label-primary,#000);font:14px/1.6 var(--dsw-font-family,system-ui)}
-.km-about h2{margin:0;font-size:20px;font-weight:600;line-height:28px}
+.km-about{max-width:760px;display:flex;flex-direction:column;gap:18px;color:var(--dsw-alias-label-primary,#1A1815);font:14px/1.6 var(--dsw-font-family,system-ui)}
+.km-about h2{margin:0;font-size:22px;font-weight:700;line-height:30px;letter-spacing:-.01em}
 .km-about h3{margin:0 0 6px;font-size:15px;font-weight:600}
-.km-about p{margin:0;color:var(--dsw-alias-label-secondary,rgba(0,0,0,.85))}
-.km-about-card{border:1px solid var(--dsw-alias-border-l2,rgba(0,0,0,.12));border-radius:var(--dsw-radius-lg,16px);padding:16px;background:var(--dsw-alias-bg-layer-1,#fff);display:flex;flex-direction:column;gap:8px}
-.km-about-head{display:flex;align-items:center;gap:12px}
-.km-about-head img{width:40px;height:40px;border-radius:32%;flex:none}
-.km-about-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:9999px;font-size:12px;line-height:18px;background:var(--km-primary-soft,rgba(23,131,255,.1));color:var(--km-primary,#1783FF);border:1px solid var(--km-primary-border,rgba(23,131,255,.4))}
-.km-about-tip{margin:0;font-size:12.5px;color:var(--dsw-alias-label-tertiary,rgba(0,0,0,.5))}
+.km-about p{margin:0;color:var(--dsw-alias-label-secondary,rgba(26,24,21,.68))}
+.km-about-card{border:1px solid var(--dsw-alias-border-l2,rgba(26,24,21,.12));border-radius:var(--dsw-radius-lg,20px);padding:18px;background:var(--dsw-alias-bg-layer-1,#fff);display:flex;flex-direction:column;gap:8px;transition:box-shadow var(--km-dur-mid,.22s) var(--km-ease-out,cubic-bezier(0,0,.2,1))}
+.km-about-card:hover{box-shadow:0 6px 20px rgba(23,131,255,.10)}
+.km-about-head{display:flex;align-items:center;gap:14px}
+.km-about-head img{width:44px;height:44px;border-radius:32%;flex:none;box-shadow:0 6px 18px rgba(23,131,255,.28)}
+.km-about-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:9999px;font-size:12px;font-weight:600;line-height:18px;background:var(--km-gradient-soft,linear-gradient(135deg,rgba(77,160,255,.14),rgba(47,32,255,.10)));color:var(--km-primary,#1783FF);border:1px solid var(--km-primary-border,rgba(23,131,255,.32))}
+.km-about-tip{margin:0;font-size:12.5px;color:var(--dsw-alias-label-tertiary,rgba(26,24,21,.52))}
 .km-about a{color:var(--km-primary,#1783FF);text-decoration:none}
 .km-about a:hover{text-decoration:underline}
-@media (prefers-reduced-motion: reduce){.km-chip{transition:none}}
+@media (prefers-reduced-motion: reduce){.km-chip,.km-hero-mark,.km-about-card{transition:none}.km-hero-mark:hover{transform:none}}
 `.trim()
 
 /** 幂等安装组件层样式（与皮肤层同一约定，便于 HMR 回收）。 */
@@ -234,7 +236,7 @@ function AboutSection() {
         jsx('img', { src: markDataUrl(), alt: '', 'aria-hidden': 'true' }),
         jsxs('div', { children: [
           jsx('h2', { children: 'Kimi 风格皮肤' }),
-          jsx('span', { className: 'km-about-badge', children: 'dsh-kimi-ui · v1.1.0' }),
+          jsx('span', { className: 'km-about-badge', children: 'dsh-kimi-ui · v2.0.0' }),
         ] }),
       ] }),
       jsxs('div', { className: 'km-about-card', children: [

@@ -77,7 +77,7 @@ dsh plugin --profile desktop add link:$(pwd)
 
 Replace `desktop` with the profile actually running `dsh web`.
 
-**Activate:** restart DSH Web, then hard-refresh (`Ctrl+Shift+R`). `<html>` should carry `data-dsh-kimi-skin="1.1.0"`, and `<head>` should contain both `.../skin.css"` and `.../components.css"` style tags.
+**Activate:** restart DSH Web, then hard-refresh (`Ctrl+Shift+R`). `<html>` should carry `data-dsh-kimi-skin="2.0.0"`, and `<head>` should contain both `.../skin.css"` and `.../components.css"` style tags.
 
 **Disable / remove:**
 

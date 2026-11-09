@@ -19,7 +19,7 @@ DSH Web 的根路径返回 **401**（需要登录会话），headless 浏览器�
    ```
 
 2. **重启 DSH Web**，浏览器硬刷新（`Ctrl+Shift+R`）。
-3. 确认生效：DevTools 里 `<html>` 应有 `data-dsh-kimi-skin="1.1.0"`，
+3. 确认生效：DevTools 里 `<html>` 应有 `data-dsh-kimi-skin="2.0.0"`，
    `<head>` 里应有两张 `<style data-plugin="dsh-kimi-ui" ...>`。
 4. 新建一个**空白工作区**（避免截图里出现真实项目名 / 会话标题 / 余额）。
 5. 截两张图：
