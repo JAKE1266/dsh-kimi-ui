@@ -11,13 +11,27 @@
 
 ---
 
-## ⚠️ 关于色值的诚实说明
+## 配色来自官方 CSS 实测
 
-**本版配色是「视觉归纳」，不是官方 CSS 令牌的实测值。**
+**色值不是猜的。** 主色、中性面、文字层级、填充、边框、气泡、输入框几何、字体栈、阴影、玻璃参数、圆角阶梯，全部来自 Kimi 官方 CSS bundle 的 `:root` / `:root.dark` 令牌表：
 
-Kimi Web 为 JS 渲染且有反爬，官方 CSS bundle 未能稳定抓取。因此本插件的主色、中性阶、渐变均为基于公开界面观感的**推导值**，并按 DSH 的 `--dsw-alias-*` 语义重新映射。相比之下，同系列的 [`dsh-doubao-ui`](https://github.com/JAKE1266/dsh-doubao-ui) 用的是从豆包官方 CSS bundle 读到的**实测**令牌。
+```
+https://statics.moonshot.cn/kimi-web/assets/Bd7TiIrN.css   (328 KB, 主令牌表)
+https://statics.moonshot.cn/kimi-web/assets/5Dx4H7G1.css   (body 字体与底色)
+```
 
-如果你能提供 Kimi 官方 CSS 的令牌值，欢迎提 issue / PR —— 拿到实测值后我会更新并在 CHANGELOG 标注。
+| Kimi 官方令牌 | 浅色 | 暗色 |
+| --- | --- | --- |
+| `--Colors-KMBlue`（品牌） | `#1783ff` | `#1a88ff` |
+| `--Bg-GroundPC`（页面底） | `#fbfaf9`（暖白） | `#181817` |
+| `--Bg-Primary` / `--Bg-Secondary` | `#fff` / `#f5f5f5` | `#121212` / `#1f1f1f` |
+| `--Labels-Primary` | `#000000e6` | `#ffffffd6` |
+| `--Fills-F1`（气泡底） | `#00000008` | `#ffffff0d` |
+| `--chat-input-radius` | **24px** | 同 |
+| 气泡圆角 | **12px** | 同 |
+| 玻璃 | `blur(15px)` | 同 |
+
+**唯一需要说明的推导项**：Kimi 站点**没有**官方「品牌渐变」变量（全量 grep 41 个 CSS 后确认，`gradient` 在 HTML 中出现 0 次）。本皮肤的 `--km-gradient` 由「品牌蓝 → 代码卡片深紫 `#2f20ff`」组合而成，属推导。其余推导项（字号基线、部分中间态透明度）在 [`docs/DESIGN.md`](docs/DESIGN.md) §6 逐条列出。
 
 ---
 
@@ -27,12 +41,12 @@ Kimi Web 为 JS 渲染且有反爬，官方 CSS bundle 未能稳定抓取。因�
 
 | 方面 | 皮肤做了什么 |
 | --- | --- |
-| **配色** | 深蓝紫主色 `#5A5FE0`、冷调蓝灰中性面，覆盖 DSH 全部 `--dsw-alias-*` / `--dsw-static-*` / `--dsw-specific-*` 语义令牌 |
-| **深色优先** | 暗色不是简单反色：底 `#0E1020`、层 `#15172A`/`#1A1D33`/`#22263F`，主色提亮到 `#7B8CFF` |
-| **玻璃质感** | 菜单、对话框、快捷胶囊带 `backdrop-filter: blur(20px) saturate(160%)` |
-| **几何** | 大圆角：气泡 16px、输入卡 24px、面板 24px、胶囊 9999px |
-| **输入框** | 24px 大圆角 + focus 蓝色柔光环 + 发送键品牌渐变 |
-| **排版** | 15px 字号基线、系统无衬线栈、代码块/引用块统一圆角 |
+| **配色** | Kimi 品牌蓝 `#1783ff` + 暖白/中性面，覆盖 DSH 全部 `--dsw-alias-*` / `--dsw-static-*` / `--dsw-specific-*` 语义令牌 |
+| **明暗主题** | 跟随宿主（`body[data-ds-dark-theme]`）；暗色是 Kimi 的**中性偏暖** `#121212`/`#181817`，不是蓝紫黑 |
+| **玻璃质感** | 菜单、对话框、快捷胶囊带 `backdrop-filter: blur(15px)`（Kimi 最高频参数，20 处） |
+| **几何** | 气泡 12px、输入卡 **24px**、面板 24px、胶囊 9999px —— 全部实测 |
+| **输入框** | 24px 大圆角 + `0 5px 16px -4px #00000012` 阴影 + focus 柔光环 |
+| **排版** | Kimi 官方字体栈、15px 字号基线、代码块统一圆角 |
 | **可访问性** | 尊重 `prefers-reduced-motion`；不破坏 DSH 的「仅键盘显示焦点环」逻辑 |
 
 ### 第二层 · 组件（声明式 React 插槽）
@@ -50,7 +64,7 @@ Kimi Web 为 JS 渲染且有反爬，官方 CSS bundle 未能稳定抓取。因�
 
 ## 为什么主体是「CSS 变量覆盖」
 
-DSH Web 的整站视觉由 `--dsw-alias-*` 变量在 `body` 上驱动，所有官方组件只消费这些变量。在变量层替换，就能在不触碰任何业务组件的前提下换掉全站外观：
+DSH Web 的整站视觉由 `--dsw-alias-*` 变量在 `body` 上驱动。在变量层替换，就能在不触碰任何业务组件的前提下换掉全站外观：
 
 - **零依赖**：没有构建框架、没有运行时依赖，`npm install` 都不需要（`dsh.client.inject` 里那几个包名只是**模块图装载顺序前置声明**；React 由宿主种子模块提供）。
 - **升级友好**：不依赖宿主的 CSS Module 哈希类名，所有选择器走 `:root` / `body` / 实测 `data-*` 锚点。
@@ -63,32 +77,25 @@ DSH Web 的整站视觉由 `--dsw-alias-*` 变量在 `body` 上驱动，所有�
 
 ## 安装
 
-### 从 GitHub（推荐）
-
 ```bash
+# 从 GitHub（client/client.js 已提交，无 prepare 脚本，安装不编译）
 dsh plugin --profile desktop add github:JAKE1266/dsh-kimi-ui
-```
 
-`client/client.js` 已随仓库提交，且没有 `prepare` 脚本，安装不触发编译。
-
-> 把 `desktop` 换成实际运行 DSH Web 的 profile 名（`dsh --profile desktop --dump-config` 可确认）。
-
-### 从本地源码
-
-```powershell
+# 从本地源码
 git clone https://github.com/JAKE1266/dsh-kimi-ui.git
-Set-Location .\dsh-kimi-ui
-node scripts/build.mjs
-node test/run-all.mjs
+cd dsh-kimi-ui
+node scripts/build.mjs && node test/run-all.mjs
 dsh plugin --profile desktop add link:<本目录绝对路径>
 ```
+
+把 `desktop` 换成实际运行 DSH Web 的 profile 名。
 
 ### 生效
 
 1. **重启 DSH Web**。
 2. 硬刷新浏览器（`Ctrl+Shift+R`）。
-3. DevTools 里 `<html>` 应出现 `data-dsh-kimi-skin="1.0.0"`，`<head>` 里有两张样式表：
-   `<style data-plugin="dsh-kimi-ui" data-plugin-css="dsh-kimi-ui/skin.css">` 与 `.../components.css"`。
+3. DevTools 里 `<html>` 应出现 `data-dsh-kimi-skin="1.1.0"`，`<head>` 里有两张样式表：
+   `.../skin.css"` 与 `.../components.css"`。
 
 ### 停用 / 卸载
 
@@ -97,19 +104,14 @@ dsh plugin --profile desktop disable dsh-kimi-ui
 dsh plugin --profile desktop remove dsh-kimi-ui
 ```
 
-硬刷新一次，官方界面即恢复。
-
 ---
 
 ## ⚠️ 与其他皮肤互斥
 
 **同时只能启用一个全站换肤插件。** 本插件与 `dsh-doubao-ui`、`dsh-zcode-ui`、`dsh-wechat-ui` 都覆盖同一批 `--dsw-*` 令牌，同时启用会互相覆盖（后加载者胜出，通常表现为混色）。
 
-切换方式：
-
 ```bash
-dsh plugin --profile desktop disable dsh-doubao-ui   # 先停用旧的
-# 再启用新的（或反过来）
+dsh plugin --profile desktop disable dsh-doubao-ui   # 先停用旧的，再启用新的
 ```
 
 ---
@@ -129,8 +131,7 @@ dsh plugin --profile desktop disable dsh-doubao-ui   # 先停用旧的
 改完必须重建（产物随仓库提交）：
 
 ```bash
-node scripts/build.mjs
-node test/run-all.mjs
+node scripts/build.mjs && node test/run-all.mjs
 ```
 
 > 测试会强制校验**亮/暗两套令牌的键集合完全一致**（205 个），以及 **React 缺失时组件层能整体降级** —— 后者是防止白屏最关键的一道闸。
@@ -159,7 +160,7 @@ lib/index.mjs         Host 半：空的 Loader 座位
 scripts/build.mjs     零依赖多模块打包器
 test/run-all.mjs      零依赖验证套件
 cordis.patch.yml      profile bundle 挂载声明
-docs/DESIGN.md        设计令牌映射与来源
+docs/DESIGN.md        设计令牌映射与来源（实测 / 推导逐条标注）
 .github/workflows/    CI
 ```
 

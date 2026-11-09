@@ -1,7 +1,7 @@
 {
   "name": "dsh-kimi-ui",
-  "version": "1.0.0",
-  "description": "Kimi 风格皮肤 for DeepSeek Harness Web：深蓝紫渐变主色、深色优先、玻璃质感面板与大圆角几何。纯 CSS 令牌覆盖 + 声明式插槽，零运行时依赖，不碰会话数据。inspired-by，非月之暗面官方。",
+  "version": "1.1.0",
+  "description": "Kimi 风格皮肤 for DeepSeek Harness Web：Kimi 官方 CSS 实测色板驱动的品牌蓝主题、暖白/中性暗面、玻璃质感面板与 24px 大圆角输入框。纯 CSS 令牌覆盖 + 声明式插槽，零运行时依赖。inspired-by，非月之暗面官方。",
   "type": "module",
   "main": "lib/index.mjs",
   "exports": {

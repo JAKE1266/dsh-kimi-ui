@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -16,14 +16,20 @@ jobs:
         with:
           node-version: '22'
 
-      # 鏈寘闆朵緷璧栵紝涓嶉渶瑕?npm install銆傛瀯寤轰骇鐗╅殢浠撳簱鎻愪氦锛屽洜姝?CI 瑕?      # 楠岃瘉銆岄噸鏂版瀯寤轰笉浜х敓宸紓銆嶁€斺€旈槻姝㈡湁浜烘敼浜?src 鍗村繕浜嗚窇 build銆?      - name: Build
+      # This package has zero dependencies, so no npm install is needed.
+      # The build artifact is committed, so CI rebuilds it and asserts the
+      # result is byte-identical, catching "edited src but forgot to build".
+      - name: Build
         run: node scripts/build.mjs
 
       - name: Build output is committed
         run: git diff --exit-code -- client/client.js
 
-      # 15 椤规鏌ワ細浜х墿璇硶/宸ュ巶濂戠害銆? 妯″潡鍐呰仈銆佸弻涓婚 CSS銆?      # 浜殫閿泦鍚堜竴鑷存€с€佹牱寮忓箓绛変笌鍥炴敹銆乤pply 瀹归敊銆佺粍浠跺眰鎻掓Ы涓?      # React 缂哄け闄嶇骇銆佺粍浠舵牱寮忓洖鏀躲€乵anifest 鑷唇銆?      - name: Verify
+      # 18 checks: factory contract, four inlined modules, dual-theme CSS,
+      # light/dark key parity, idempotent injection and teardown, apply fault
+      # tolerance, slot declarations, React-missing degradation, manifest.
+      - name: Verify
         run: node test/run-all.mjs
 
       - name: Manifest sanity
-        run: node -e "const p=require('./package.json'); if(p.name!=='dsh-kimi-ui') throw new Error('bad name'); if(p.dsh.client.platform!=='web') throw new Error('bad platform'); console.log('manifest ok:', p.name, p.version)"
+        run: node -e "const p=require('./package.json'); if(p.name!=='dsh-kimi-ui') throw new Error('bad name'); if(p.dsh.client.platform!=='web') throw new Error('bad platform'); if(!p.dsh.client.inject.includes('@deepseek-ai/dsh-client-ui-theme')) throw new Error('missing ui-theme inject'); console.log('manifest ok:', p.name, p.version)"

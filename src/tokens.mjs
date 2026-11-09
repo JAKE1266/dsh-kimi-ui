@@ -9,24 +9,39 @@
  * dsh-doubao-ui / dsh-zcode-ui 源码确认）。选择器用 `:root:root` 前缀把
  * 亮/暗分别抬到 (0,2,1)/(0,3,1)，确定性胜出，不依赖样式表加载顺序。
  *
- * ── 色值来源（严格区分实测 / 推导）────────────────────────────────────
- * 【推导】本版全部色值基于对 Kimi（月之暗面）公开界面的视觉归纳，尚未取得
- *   官方 CSS 设计令牌的实测值。Kimi Web 为 JS 渲染 + 反爬，官方 CSS bundle
- *   未能稳定抓取。因此：
- *     - 品牌主色取 Kimi 界面观感的深蓝紫 `#5A5FE0`，渐变 `#7B8CFF → #3D3FA8`；
- *     - 中性面采用偏冷的蓝灰（Kimi 是冷调而非暖调），深色优先；
- *     - 玻璃质感（backdrop-filter）是 Kimi 面板的显著特征；
- *     - 大圆角：气泡 18px、输入框 24px、胶囊 9999px。
- *   待取得实测值后会在 CHANGELOG 标注并更新。**不要把本文件当作官方色值。**
- * 【实测】DSH 侧 208 个 `--dsw-*` 令牌名与 `data-*` 锚点来自本机 app.asar
- *   字符串扫描与官方包源码（与 dsh-doubao-ui 同一份调研）。
+ * ── 色值来源（实测 / 推导，逐项标注）──────────────────────────────────
+ * 【实测】主色、中性面、文字层级、填充、边框、气泡、输入框几何、字体栈、
+ *   阴影、玻璃参数、圆角阶梯，全部来自 Kimi 官方 CSS bundle 的 `:root` /
+ *   `:root.dark` 令牌表：
+ *     https://statics.moonshot.cn/kimi-web/assets/Bd7TiIrN.css（328 KB，主令牌表）
+ *     https://statics.moonshot.cn/kimi-web/assets/5Dx4H7G1.css（body 字体与底色）
+ *   对应官方令牌名：
+ *     --Colors-KMBlue              #1783ff / 暗 #1a88ff
+ *     --Colors-Purple              #985ffb / 暗 #a16bff
+ *     --Bg-GroundPC                #fbfaf9 / 暗 #181817   ← 页面底 + 侧栏底
+ *     --Bg-Primary/Secondary/Tertiary/Quaternary
+ *     --Labels-Primary/Secondary/Tertiary/Quaternary
+ *     --Separators-S1  --Fills-F1..F4
+ *     --Others-BubbleBlue / --Others-BubbleGray_PC
+ *     --chat-input-radius 24px / --chat-input-max-width 768px
+ *   几何实测：气泡 12px、输入框 24px、圆角阶梯 8/12/16/20/24px、
+ *     玻璃 blur(15px)（最高频，20 处）、字体栈与 body 字号 14px。
+ *
+ * 【推导】以下为按 DSH 语义做的适配，不是 Kimi 实测值：
+ *   - Kimi **没有**官方「品牌渐变」变量。站点唯一的蓝紫渐变是代码卡片背景
+ *     （浅 #d6f5ff→#c1ddff→#eae9ff / 暗 #1a88ff→#1c82ff→#2f20ff）。
+ *     本皮肤的 --km-gradient 由「品牌蓝 → 代码卡深紫」组合而成，标为推导。
+ *   - 字号基线取 15px（DSH 默认 14px、Kimi body 14px；取 15 避免过小）。
+ *   - 部分中间态透明度、DSH 专属令牌（无 Kimi 对应物）按视觉一致性推导。
+ *   - 「侧栏底 = --Bg-GroundPC」属实测值 + 语义归属推断。
+ *
  * 【声明】本皮肤是 inspired-by 再设计，不是官方资产的复刻；本仓库不含任何
  *   来自 Kimi 客户端的图片、图标或字体。商标与名称归各自权利人所有，
  *   本插件与月之暗面 / Kimi、DeepSeek 无任何隶属或背书关系。
  */
 
 /** 皮肤版本：改动令牌口径时递增，便于排查浏览器里挂着的旧样式。 */
-export const SKIN_VERSION = '1.0.0'
+export const SKIN_VERSION = '1.1.0'
 
 /** 标记属性，注入到 <html> 上，便于在 DevTools 里确认皮肤已激活。 */
 export const SKIN_ATTRIBUTE = 'data-dsh-kimi-skin'
@@ -41,10 +56,11 @@ export const LIGHT_SELECTOR = ':root:root body'
 export const DARK_SELECTOR = ':root:root body[data-ds-dark-theme]'
 
 /**
- * 与主题无关的几何/排版令牌。
+ * 与主题无关的几何/排版令牌 —— 全部为 Kimi 官方 CSS 实测值。
  *
- * Kimi 的几何特征是「更大更圆」：气泡 18px、输入卡 24px、面板 20px。
- * 字体栈用系统无衬线，CJK 回退族前置。
+ * 圆角阶梯实测频次：12px(106) / 8px(105) / 10px(85) / 16px(50) / 4px(41) /
+ * 6px(36) / 20px(29) / 24px(10) / 100px(7)。
+ * 输入框 24px、气泡 12px、玻璃 blur(15px)。
  */
 export const STRUCTURAL = Object.freeze({
   '--dsw-radius-xs': '4px',
@@ -55,20 +71,20 @@ export const STRUCTURAL = Object.freeze({
   '--dsw-radius-panel': '24px',
   '--dsw-radius-2xl': '24px',
   '--dsw-radius-full': '9999px',
-  '--dsw-shadow-lv1': '0 1px 2px rgba(20, 22, 46, 0.06)',
-  '--dsw-shadow-lv1-blur': '0 2px 8px rgba(20, 22, 46, 0.05)',
-  '--dsw-shadow-lv2': '0 4px 16px rgba(20, 22, 46, 0.08), 0 1px 3px rgba(20, 22, 46, 0.05)',
-  '--dsw-shadow-lv3': '0 0 1px rgba(20, 22, 46, 0.14), 0 12px 36px rgba(20, 22, 46, 0.16)',
-  '--dsw-elevation-soft': '0 1px 2px rgba(20, 22, 46, 0.06)',
-  '--dsw-elevation-panel': '0 4px 16px rgba(20, 22, 46, 0.08), 0 1px 3px rgba(20, 22, 46, 0.05)',
-  '--dsw-elevation-prominent': '0 12px 36px rgba(20, 22, 46, 0.16)',
-  '--dsw-elevation-stroke-color': 'rgba(20, 22, 46, 0.1)',
-  '--dsw-corner-shape': '18px',
+  '--dsw-shadow-lv1': '0 1px 2px rgba(0, 0, 0, 0.05)',
+  '--dsw-shadow-lv1-blur': '0 4px 10px rgba(0, 0, 0, 0.1)',
+  '--dsw-shadow-lv2': '0 4px 16.4px rgba(0, 0, 0, 0.1)',
+  '--dsw-shadow-lv3': '0 4px 16px rgba(0, 0, 0, 0.1)',
+  '--dsw-elevation-soft': '0 1px 2px rgba(0, 0, 0, 0.05)',
+  '--dsw-elevation-panel': '0 4px 16.4px rgba(0, 0, 0, 0.1)',
+  '--dsw-elevation-prominent': '0 4px 16px rgba(0, 0, 0, 0.1)',
+  '--dsw-elevation-stroke-color': 'rgba(0, 0, 0, 0.13)',
+  '--dsw-corner-shape': '12px',
+  // 官方字体栈（实测 body 规则）
   '--dsw-font-family':
-    'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, "Noto Sans", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
-  '--dsh-font-family-code-default':
-    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-  // 字号基线 15px：DSH 默认 14px，Kimi 正文偏大；取折中避免宿主布局溢出（推导）。
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", sans-serif, Arial, "PingFang SC", "Source Han Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC"',
+  '--dsh-font-family-code-default': '"Geist Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace',
+  // 字号基线 15px（推导）：DSH 默认 14px，Kimi body 14px，取 15 略大以贴近 Kimi 阅读感。
   '--dsw-font-size-base': '15px',
   '--dsw-font-size-display': 'calc(var(--dsw-font-size-base) + 20px)',
   '--dsw-font-size-headline': 'calc(var(--dsw-font-size-base) + 8px)',
@@ -83,131 +99,133 @@ export const STRUCTURAL = Object.freeze({
   '--dsh-scrollbar-thumb-border': '2px',
   '--dsw-focus-ring-width': '2px',
   // Kimi 私有语义变量：供 STRUCTURE_CSS 与组件层消费。
-  '--km-primary': '#5A5FE0',
-  '--km-primary-hover': '#4A4FC8',
-  '--km-primary-active': '#3D3FA8',
-  '--km-primary-soft': 'rgba(90, 95, 224, 0.1)',
-  '--km-primary-border': 'rgba(123, 140, 255, 0.4)',
-  '--km-gradient': 'linear-gradient(135deg, #7B8CFF 0%, #5A5FE0 55%, #3D3FA8 100%)',
-  '--km-gradient-button': 'linear-gradient(135deg, #6E7BFF 0%, #4A4FC8 100%)',
-  '--km-user-bubble': 'rgba(90, 95, 224, 0.08)',
-  '--km-glass-blur': 'blur(20px) saturate(160%)',
-  '--km-glass-fill': 'rgba(255, 255, 255, 0.72)',
+  '--km-primary': '#1783ff',
+  '--km-primary-hover': '#167ff7',
+  '--km-primary-active': '#167cf2',
+  '--km-primary-soft': 'rgba(23, 131, 255, 0.08)',
+  '--km-primary-border': 'rgba(23, 131, 255, 0.3)',
+  // 推导：Kimi 无官方品牌渐变；这里由「品牌蓝 → 代码卡深紫」组合。
+  '--km-gradient': 'linear-gradient(135deg, #1783ff 0%, #2f20ff 100%)',
+  '--km-gradient-button': 'linear-gradient(135deg, #1783ff 0%, #167cf2 100%)',
+  '--km-user-bubble': 'rgba(0, 0, 0, 0.03)',
+  '--km-glass-blur': 'blur(15px)',
+  '--km-glass-fill': 'rgba(255, 255, 255, 0.9)',
   '--km-composer-radius': '24px',
-  '--km-composer-shadow': '0 8px 32px rgba(20, 22, 46, 0.1)',
-  '--km-content-max-width': '880px',
-  '--km-ease': 'cubic-bezier(.2,0,0,1)',
-  '--km-ease-out': 'cubic-bezier(0,0,.2,1)',
+  '--km-composer-shadow': '0 5px 16px -4px rgba(0, 0, 0, 0.07)',
+  '--km-content-max-width': '768px',
+  '--km-ease': 'cubic-bezier(.25, 1, .3, 1)',
+  '--km-ease-out': 'cubic-bezier(.23, 1, .32, 1)',
   '--km-dur': '.15s',
   '--km-dur-mid': '.2s',
 })
 
 /**
- * 亮色色板。
+ * 亮色色板 —— 官方 `:root` 实测值。
  * 键集合必须与 DARK 完全一致 —— test/run-all.mjs 会强制校验。
  */
 export const LIGHT = Object.freeze({
-  // ── 静态中性阶梯（冷蓝灰） ──
+  // ── 静态中性阶梯（Kimi 是暖白，不是冷灰） ──
   '--dsw-static-neutral-bluish-950': '#FFFFFF',
-  '--dsw-static-neutral-bluish-875': '#FAFBFF',
-  '--dsw-static-neutral-bluish-850': '#F5F7FD',
-  '--dsw-static-neutral-bluish-800': '#EEF1F9',
-  '--dsw-static-neutral-bluish-750': '#E3E8F4',
-  '--dsw-static-neutral-bluish-700': '#D2D9EA',
-  '--dsw-static-neutral-bluish-600': '#B6BFD6',
-  '--dsw-static-neutral-bluish-500': '#939DB8',
-  '--dsw-static-neutral-bluish-400': '#6B7590',
-  '--dsw-static-neutral-bluish-300': '#4C5570',
-  '--dsw-static-neutral-bluish-200': '#333B52',
-  '--dsw-static-neutral-bluish-150': '#E3E8F4',
-  '--dsw-static-neutral-bluish-100': '#D2D9EA',
-  '--dsw-static-neutral-bluish-75': '#EEF1F9',
-  '--dsw-static-neutral-bluish-60': '#EEF1F9',
-  '--dsw-static-neutral-bluish-50': '#F5F7FD',
-  '--dsw-static-neutral-bluish-00': '#14162E',
-  '--dsw-static-neutral-bluish-1000': '#14162E',
+  '--dsw-static-neutral-bluish-875': '#FBFCFD',
+  '--dsw-static-neutral-bluish-850': '#FAFAF9',
+  '--dsw-static-neutral-bluish-800': '#F5F5F5',
+  '--dsw-static-neutral-bluish-750': '#EDEDED',
+  '--dsw-static-neutral-bluish-700': '#DEDEDE',
+  '--dsw-static-neutral-bluish-600': '#C2C2C2',
+  '--dsw-static-neutral-bluish-500': '#9E9E9E',
+  '--dsw-static-neutral-bluish-400': '#757575',
+  '--dsw-static-neutral-bluish-300': '#565656',
+  '--dsw-static-neutral-bluish-200': '#333333',
+  '--dsw-static-neutral-bluish-150': '#EDEDED',
+  '--dsw-static-neutral-bluish-100': '#DEDEDE',
+  '--dsw-static-neutral-bluish-75': '#F5F5F5',
+  '--dsw-static-neutral-bluish-60': '#F5F5F5',
+  '--dsw-static-neutral-bluish-50': '#FAFAF9',
+  '--dsw-static-neutral-bluish-00': '#000000',
+  '--dsw-static-neutral-bluish-1000': '#000000',
 
-  // ── 背景 ──
-  '--dsw-alias-bg-base': '#FFFFFF',
+  // ── 背景（--Bg-* 实测） ──
+  // 页面底 = --Bg-GroundPC #fbfaf9（暖白），侧栏同色。
+  '--dsw-alias-bg-base': '#FBFAF9',
   '--dsw-alias-bg-layer-1': '#FFFFFF',
-  '--dsw-alias-bg-layer-2': '#F5F7FD',
-  '--dsw-alias-bg-layer-3': '#EEF1F9',
-  '--dsw-alias-bg-layer-4': '#E3E8F4',
+  '--dsw-alias-bg-layer-2': '#F5F5F5',
+  '--dsw-alias-bg-layer-3': '#FFFFFF',
+  '--dsw-alias-bg-layer-4': '#F5F5F5',
   '--dsw-alias-bg-overlay': '#FFFFFF',
-  '--dsw-alias-bg-module-platform': '#F5F7FD',
-  '--dsw-alias-bg-multi-select': 'rgba(90, 95, 224, 0.12)',
+  '--dsw-alias-bg-module-platform': '#F5F5F5',
+  '--dsw-alias-bg-multi-select': 'rgba(23, 131, 255, 0.1)',
   '--dsw-alias-bg-l1': '#FFFFFF',
-  '--dsw-alias-bg-l2': '#F5F7FD',
-  '--dsw-alias-background-secondary': '#F5F7FD',
-  '--dsw-alias-bg-document-preview': '#FAFBFF',
-  '--dsw-alias-bg-document-selection': 'rgba(90, 95, 224, 0.26)',
-  '--dsw-alias-bg-skeleton': 'rgba(20, 22, 46, 0.04)',
-  '--dsw-alias-bg-mask-1': 'rgba(20, 22, 46, 0.28)',
-  '--dsw-alias-bg-mask-2': 'rgba(20, 22, 46, 0.12)',
-  '--dsw-alias-bg-mask-3': 'rgba(20, 22, 46, 0.48)',
+  '--dsw-alias-bg-l2': '#F5F5F5',
+  '--dsw-alias-background-secondary': '#F5F5F5',
+  '--dsw-alias-bg-document-preview': '#FBFCFD',
+  '--dsw-alias-bg-document-selection': 'rgba(23, 131, 255, 0.24)',
+  '--dsw-alias-bg-skeleton': 'rgba(0, 0, 0, 0.03)',
+  '--dsw-alias-bg-mask-1': 'rgba(0, 0, 0, 0.2)',
+  '--dsw-alias-bg-mask-2': 'rgba(0, 0, 0, 0.1)',
+  '--dsw-alias-bg-mask-3': 'rgba(0, 0, 0, 0.4)',
   '--dsw-alias-bg-mask-photo': 'rgba(0, 0, 0, 0.88)',
   '--dsw-alias-bg-mask-drop': 'rgba(255, 255, 255, 0.72)',
 
-  // ── 边框 ──
-  '--dsw-alias-border-l1': 'rgba(20, 22, 46, 0.05)',
-  '--dsw-alias-border-l2': 'rgba(20, 22, 46, 0.09)',
-  '--dsw-alias-border-subtle': 'rgba(20, 22, 46, 0.09)',
-  '--dsw-alias-border-l2-darkmode-thin': 'rgba(20, 22, 46, 0.07)',
-  '--dsw-alias-border-l3': 'rgba(20, 22, 46, 0.12)',
-  '--dsw-alias-border-l4': 'rgba(20, 22, 46, 0.16)',
-  '--dsw-alias-border-inverted': 'rgba(20, 22, 46, 0.05)',
-  '--dsw-alias-border-inverted2': 'rgba(20, 22, 46, 0.09)',
-  '--dsw-alias-separator-primary': 'rgba(20, 22, 46, 0.09)',
+  // ── 边框（--Separators-S1 #00000021 实测） ──
+  '--dsw-alias-border-l1': '#0000000F',
+  '--dsw-alias-border-l2': '#00000021',
+  '--dsw-alias-border-subtle': '#00000021',
+  '--dsw-alias-border-l2-darkmode-thin': '#00000017',
+  '--dsw-alias-border-l3': '#00000026',
+  '--dsw-alias-border-l4': '#00000040',
+  '--dsw-alias-border-inverted': '#00000008',
+  '--dsw-alias-border-inverted2': '#00000021',
+  '--dsw-alias-separator-primary': '#00000021',
 
-  // ── 文字 ──
-  '--dsw-alias-label-primary': '#14162E',
+  // ── 文字（--Labels-* 实测） ──
+  '--dsw-alias-label-primary': '#000000E6',
   '--dsw-alias-label-primary-foreground': '#FFFFFF',
   '--dsw-alias-label-primary-inverted': '#FFFFFF',
-  '--dsw-alias-label-primary-dimmed': 'rgba(20, 22, 46, 0.6)',
-  '--dsw-alias-label-primary-bluish': '#5A5FE0',
-  '--dsw-alias-label-secondary': 'rgba(20, 22, 46, 0.64)',
-  '--dsw-alias-label-tertiary': 'rgba(20, 22, 46, 0.48)',
-  '--dsw-alias-label-caption': 'rgba(20, 22, 46, 0.38)',
-  '--dsw-alias-label-dimmed': 'rgba(20, 22, 46, 0.3)',
-  '--dsw-alias-label-quaternary': 'rgba(20, 22, 46, 0.3)',
+  '--dsw-alias-label-primary-dimmed': 'rgba(0, 0, 0, 0.6)',
+  '--dsw-alias-label-primary-bluish': '#1783FF',
+  '--dsw-alias-label-secondary': '#00000099',
+  '--dsw-alias-label-tertiary': '#00000073',
+  '--dsw-alias-label-caption': '#0000004D',
+  '--dsw-alias-label-dimmed': '#0000004D',
+  '--dsw-alias-label-quaternary': '#0000004D',
   '--dsw-alias-label-error': '#E5484D',
-  '--dsw-alias-label-shimmer': 'rgba(20, 22, 46, 0.28)',
-  '--dsw-alias-label-document-preview': '#4C5570',
-  '--dsw-alias-menu-icon': 'rgba(20, 22, 46, 0.64)',
+  '--dsw-alias-label-shimmer': 'rgba(0, 0, 0, 0.28)',
+  '--dsw-alias-label-document-preview': '#565656',
+  '--dsw-alias-menu-icon': '#00000099',
 
-  // ── 品牌 / 主色（深蓝紫） ──
-  '--dsw-alias-brand-primary': '#5A5FE0',
+  // ── 品牌 / 主色（--Colors-KMBlue #1783ff 实测） ──
+  '--dsw-alias-brand-primary': '#1783FF',
   '--dsw-alias-brand-primary-invert': '#FFFFFF',
-  '--dsw-alias-brand-text': '#5A5FE0',
-  '--dsw-alias-brand-primary-new-colorprimary-new-color': '#5A5FE0',
-  '--dsw-alias-state-business-primary': '#5A5FE0',
-  '--dsw-alias-state-business-tertiary': 'rgba(90, 95, 224, 0.1)',
-  '--dsw-alias-button-primary-fill': '#5A5FE0',
-  '--dsw-alias-button-primary-hover': '#4A4FC8',
-  '--dsw-alias-button-primary-dimmed': 'rgba(90, 95, 224, 0.3)',
-  '--dsw-alias-button-contrast-fill': '#14162E',
+  '--dsw-alias-brand-text': '#1783FF',
+  '--dsw-alias-brand-primary-new-colorprimary-new-color': '#1783FF',
+  '--dsw-alias-state-business-primary': '#1783FF',
+  '--dsw-alias-state-business-tertiary': 'rgba(23, 131, 255, 0.08)',
+  '--dsw-alias-button-primary-fill': '#1783FF',
+  '--dsw-alias-button-primary-hover': '#167FF7',
+  '--dsw-alias-button-primary-dimmed': 'rgba(23, 131, 255, 0.3)',
+  '--dsw-alias-button-contrast-fill': '#000000E6',
   '--dsw-alias-button-elevated-fill': '#FFFFFF',
   '--dsw-alias-button-floating-fill': '#FFFFFF',
-  '--dsw-alias-button-floating-hover': '#F5F7FD',
-  '--dsw-alias-button-ghost-active-fill': 'rgba(90, 95, 224, 0.1)',
-  '--dsw-alias-button-ghost-active-hover': 'rgba(90, 95, 224, 0.16)',
-  '--dsw-alias-button-ghost-active-border': 'rgba(123, 140, 255, 0.4)',
-  '--dsw-alias-button-info-fill': '#5A5FE0',
-  '--dsw-alias-button-info-hover': '#4A4FC8',
-  '--dsw-alias-button-tool-bar-fill': 'rgba(76, 85, 112, 0.45)',
-  '--dsw-alias-button-tool-bar-fill-invisible': 'rgba(51, 59, 82, 0.32)',
-  '--dsw-alias-button-tool-bar-hover': 'rgba(76, 85, 112, 0.6)',
+  '--dsw-alias-button-floating-hover': '#F5F5F5',
+  '--dsw-alias-button-ghost-active-fill': '#00000008',
+  '--dsw-alias-button-ghost-active-hover': '#0000000D',
+  '--dsw-alias-button-ghost-active-border': 'rgba(23, 131, 255, 0.3)',
+  '--dsw-alias-button-info-fill': '#1783FF',
+  '--dsw-alias-button-info-hover': '#167FF7',
+  '--dsw-alias-button-tool-bar-fill': 'rgba(86, 86, 86, 0.45)',
+  '--dsw-alias-button-tool-bar-fill-invisible': 'rgba(51, 51, 51, 0.32)',
+  '--dsw-alias-button-tool-bar-hover': 'rgba(86, 86, 86, 0.6)',
 
-  // ── 交互态 ──
-  '--dsw-alias-interactive-bg-hover': 'rgba(20, 22, 46, 0.045)',
-  '--dsw-alias-interactive-bg-hover-solid': '#F5F7FD',
-  '--dsw-alias-interactive-bg-active': 'rgba(90, 95, 224, 0.1)',
-  '--dsw-alias-interactive-bg-hover-accent': 'rgba(90, 95, 224, 0.1)',
+  // ── 交互态（--Fills-F1..F4 实测） ──
+  '--dsw-alias-interactive-bg-hover': '#00000008',
+  '--dsw-alias-interactive-bg-hover-solid': '#F5F5F5',
+  '--dsw-alias-interactive-bg-active': '#0000000D',
+  '--dsw-alias-interactive-bg-hover-accent': 'rgba(23, 131, 255, 0.08)',
   '--dsw-alias-interactive-bg-hover-danger': 'rgba(229, 72, 77, 0.06)',
-  '--dsw-alias-fill-l1': 'rgba(20, 22, 46, 0.035)',
-  '--dsw-alias-fill-l2': 'rgba(20, 22, 46, 0.055)',
-  '--dsw-alias-fill-tertiary': 'rgba(20, 22, 46, 0.055)',
-  '--dsw-alias-fill-tsp-secondary': 'rgba(20, 22, 46, 0.035)',
+  '--dsw-alias-fill-l1': '#00000008',
+  '--dsw-alias-fill-l2': '#0000000D',
+  '--dsw-alias-fill-tertiary': '#00000026',
+  '--dsw-alias-fill-tsp-secondary': '#00000008',
 
   // ── 状态色 ──
   '--dsw-static-green-500': '#2E9E5B',
@@ -238,40 +256,41 @@ export const LIGHT = Object.freeze({
   '--dsw-alias-state-warn-secondary': '#D9820B',
   '--dsw-alias-state-warn-label': '#D9820B',
   '--dsw-alias-state-warn-tertiary': 'rgba(217, 130, 11, 0.12)',
-  '--dsw-alias-state-idle-primary': '#939DB8',
+  '--dsw-alias-state-idle-primary': '#9E9E9E',
 
-  // ── 蓝 / 链接（统一为品牌蓝紫） ──
-  '--dsw-static-deepseek-500': '#5A5FE0',
-  '--dsw-static-deepseek-450': '#5A5FE0',
-  '--dsw-static-deepseek-400': '#5A5FE0',
-  '--dsw-static-deepseek-600': '#4A4FC8',
-  '--dsw-static-deepseek-800': 'rgba(90, 95, 224, 0.16)',
-  '--dsw-static-deepseek-100': 'rgba(90, 95, 224, 0.12)',
-  '--dsw-static-deepseek-50': 'rgba(90, 95, 224, 0.06)',
-  '--dsw-static-deepseek-200': 'rgba(90, 95, 224, 0.18)',
-  '--dsw-static-deepseek-300': 'rgba(90, 95, 224, 0.26)',
-  '--dsw-alias-link': '#5A5FE0',
-  '--dsw-alias-label-deep-diving': '#5A5FE0',
-  '--dsw-alias-label-deep-diving-shimmer': 'rgba(90, 95, 224, 0.3)',
-  '--dsw-static-blue-500': '#5A5FE0',
-  '--dsw-static-blue-450': '#5A5FE0',
-  '--dsw-static-blue-400': '#7B8CFF',
-  '--dsw-static-blue-300': '#9AA6FF',
-  '--dsw-static-blue-100': 'rgba(90, 95, 224, 0.12)',
+  // ── 蓝 / 链接（统一为 Kimi 品牌蓝） ──
+  '--dsw-static-deepseek-500': '#1783FF',
+  '--dsw-static-deepseek-450': '#1783FF',
+  '--dsw-static-deepseek-400': '#1783FF',
+  '--dsw-static-deepseek-600': '#167FF7',
+  '--dsw-static-deepseek-800': 'rgba(23, 131, 255, 0.16)',
+  '--dsw-static-deepseek-100': 'rgba(23, 131, 255, 0.08)',
+  '--dsw-static-deepseek-50': 'rgba(23, 131, 255, 0.05)',
+  '--dsw-static-deepseek-200': 'rgba(23, 131, 255, 0.14)',
+  '--dsw-static-deepseek-300': 'rgba(23, 131, 255, 0.22)',
+  // --Others-LinkBlue #3061a0 实测
+  '--dsw-alias-link': '#3061A0',
+  '--dsw-alias-label-deep-diving': '#1783FF',
+  '--dsw-alias-label-deep-diving-shimmer': 'rgba(23, 131, 255, 0.3)',
+  '--dsw-static-blue-500': '#1783FF',
+  '--dsw-static-blue-450': '#1783FF',
+  '--dsw-static-blue-400': '#4DA0FF',
+  '--dsw-static-blue-300': '#80BBFF',
+  '--dsw-static-blue-100': 'rgba(23, 131, 255, 0.1)',
 
   // ── Markdown / 代码 ──
-  '--dsw-alias-markdown-code-block': '#F5F7FD',
-  '--dsw-alias-markdown-code-block-banner': '#EEF1F9',
-  '--dsw-alias-markdown-inline-code': 'rgba(90, 95, 224, 0.09)',
-  '--dsw-alias-markdown-code-editor-bg': '#14162E',
-  '--dsw-alias-markdown-code-editor-fg': '#E8EBF5',
-  '--dsw-alias-markdown-tag': '#E3E8F4',
-  '--dsw-alias-markdown-citation': '#F5F7FD',
-  '--dsw-alias-markdown-placeholder': '#FAFBFF',
+  '--dsw-alias-markdown-code-block': '#F5F5F5',
+  '--dsw-alias-markdown-code-block-banner': '#EDEDED',
+  '--dsw-alias-markdown-inline-code': 'rgba(0, 0, 0, 0.05)',
+  '--dsw-alias-markdown-code-editor-bg': '#121212',
+  '--dsw-alias-markdown-code-editor-fg': '#EDEDED',
+  '--dsw-alias-markdown-tag': '#EDEDED',
+  '--dsw-alias-markdown-citation': '#F5F5F5',
+  '--dsw-alias-markdown-placeholder': '#FBFCFD',
   '--dsw-alias-markdown-code-segment-selected': '#FFFFFF',
-  '--dsw-alias-markdown-code-segment-unselected': '#F5F7FD',
-  '--dsw-alias-turn-trigger-bg': '#F5F7FD',
-  '--dsw-alias-turn-trigger-bg-hover': 'rgba(20, 22, 46, 0.045)',
+  '--dsw-alias-markdown-code-segment-unselected': '#F5F5F5',
+  '--dsw-alias-turn-trigger-bg': '#F5F5F5',
+  '--dsw-alias-turn-trigger-bg-hover': '#00000008',
   '--dsw-alias-code-diff-added': 'rgba(46, 158, 91, 0.08)',
   '--dsw-alias-code-diff-deleted': 'rgba(229, 72, 77, 0.08)',
   '--dsw-alias-file-diff-added-bg': '#EAF7EF',
@@ -282,161 +301,163 @@ export const LIGHT = Object.freeze({
   '--dsw-alias-file-diff-deleted-marker': '#E5484D',
 
   // ── 滚动条 / 浮层 / 表单 ──
-  '--dsw-alias-scrollbar-bg-l1': 'rgba(20, 22, 46, 0.1)',
-  '--dsw-alias-scrollbar-bg-l2': 'rgba(20, 22, 46, 0.1)',
-  '--dsw-alias-scrollbar-hover-l1': 'rgba(76, 85, 112, 0.3)',
-  '--dsw-alias-scrollbar-hover-l2': 'rgba(76, 85, 112, 0.3)',
+  '--dsw-alias-scrollbar-bg-l1': 'rgba(0, 0, 0, 0.1)',
+  '--dsw-alias-scrollbar-bg-l2': 'rgba(0, 0, 0, 0.1)',
+  '--dsw-alias-scrollbar-hover-l1': 'rgba(0, 0, 0, 0.3)',
+  '--dsw-alias-scrollbar-hover-l2': 'rgba(0, 0, 0, 0.3)',
   '--dsw-alias-toast-bg': '#FFFFFF',
-  '--dsw-alias-toast-label': '#14162E',
-  '--dsw-alias-tooltip-bg': '#14162E',
-  '--dsw-alias-tooltip-label': '#F5F7FD',
-  '--dsw-alias-tooltip-key-bg': '#333B52',
-  '--dsw-alias-menu-group-header-fill': 'rgba(245, 247, 253, 0.94)',
+  '--dsw-alias-toast-label': '#000000E6',
+  '--dsw-alias-tooltip-bg': '#000000E6',
+  '--dsw-alias-tooltip-label': '#FFFFFF',
+  '--dsw-alias-tooltip-key-bg': '#333333',
+  '--dsw-alias-menu-group-header-fill': 'rgba(250, 250, 249, 0.94)',
   '--dsw-alias-switch-thumb': '#FFFFFF',
   '--dsw-alias-settings-card-fill': '#FFFFFF',
-  '--dsw-alias-settings-card-stroke': 'rgba(20, 22, 46, 0.09)',
-  '--dsw-alias-onboarding-accent': '#5A5FE0',
+  '--dsw-alias-settings-card-stroke': '#00000021',
+  '--dsw-alias-onboarding-accent': '#1783FF',
   '--dsw-alias-onboarding-card-fill': '#FFFFFF',
-  '--dsw-alias-onboarding-secondary-fill': '#F5F7FD',
-  '--dsw-alias-onboarding-checkbox-border': 'rgba(20, 22, 46, 0.16)',
-  '--dsw-focus-ring-color': '#5A5FE0',
-  '--dsw-alias-icon-blue': '#5A5FE0',
+  '--dsw-alias-onboarding-secondary-fill': '#F5F5F5',
+  '--dsw-alias-onboarding-checkbox-border': '#00000026',
+  '--dsw-focus-ring-color': '#1783FF',
+  '--dsw-alias-icon-blue': '#1783FF',
 
   // ── 特定表面 ──
-  '--dsw-specific-sidebar-fill': '#F5F7FD',
-  '--dsw-specific-sidebar-nav-item-active': 'rgba(90, 95, 224, 0.1)',
-  '--dsw-specific-sidebar-nav-item-active-accent': '#5A5FE0',
-  '--dsw-specific-bubble': 'rgba(90, 95, 224, 0.08)',
-  '--dsw-specific-bubble-highlight': 'rgba(90, 95, 224, 0.16)',
+  // 侧栏底 = --Bg-GroundPC（实测值 + 语义归属推断）
+  '--dsw-specific-sidebar-fill': '#FBFAF9',
+  '--dsw-specific-sidebar-nav-item-active': '#0000000D',
+  '--dsw-specific-sidebar-nav-item-active-accent': '#1783FF',
+  // 用户气泡 = --Fills-F1 #00000008（实测）
+  '--dsw-specific-bubble': '#00000008',
+  '--dsw-specific-bubble-highlight': '#0000000D',
   '--dsw-specific-input-major': '#FFFFFF',
   '--dsw-specific-login-input': '#FFFFFF',
-  '--dsw-specific-selector': '#5A5FE0',
-  '--dsw-specific-tip': '#EEF1F9',
-  '--dsw-specific-menu-item-hover': '#F5F7FD',
+  '--dsw-specific-selector': '#1783FF',
+  '--dsw-specific-tip': '#F5F5F5',
+  '--dsw-specific-menu-item-hover': '#F5F5F5',
   '--dsw-specific-menu': '#FFFFFF',
-  '--dsw-menu-surface-fill': 'rgba(255, 255, 255, 0.86)',
-  '--dsw-menu-backdrop-filter': 'blur(20px) saturate(160%)',
+  '--dsw-menu-surface-fill': '#FFFFFFE6',
+  '--dsw-menu-backdrop-filter': 'blur(15px)',
 
   // ── Kimi 私有：亮色（键集合必须与 DARK 完全一致） ──
-  '--km-primary': '#5A5FE0',
-  '--km-primary-hover': '#4A4FC8',
-  '--km-primary-active': '#3D3FA8',
-  '--km-primary-soft': 'rgba(90, 95, 224, 0.1)',
-  '--km-primary-border': 'rgba(123, 140, 255, 0.4)',
-  '--km-gradient': 'linear-gradient(135deg, #7B8CFF 0%, #5A5FE0 55%, #3D3FA8 100%)',
-  '--km-gradient-button': 'linear-gradient(135deg, #6E7BFF 0%, #4A4FC8 100%)',
-  '--km-user-bubble': 'rgba(90, 95, 224, 0.08)',
-  '--km-glass-blur': 'blur(20px) saturate(160%)',
-  '--km-glass-fill': 'rgba(255, 255, 255, 0.72)',
+  '--km-primary': '#1783FF',
+  '--km-primary-hover': '#167FF7',
+  '--km-primary-active': '#167CF2',
+  '--km-primary-soft': 'rgba(23, 131, 255, 0.08)',
+  '--km-primary-border': 'rgba(23, 131, 255, 0.3)',
+  '--km-gradient': 'linear-gradient(135deg, #1783ff 0%, #2f20ff 100%)',
+  '--km-gradient-button': 'linear-gradient(135deg, #1783ff 0%, #167cf2 100%)',
+  '--km-user-bubble': '#00000008',
+  '--km-glass-blur': 'blur(15px)',
+  '--km-glass-fill': '#FFFFFFE6',
   '--km-composer-radius': '24px',
-  '--km-composer-shadow': '0 8px 32px rgba(20, 22, 46, 0.1)',
-  '--km-content-max-width': '880px',
-  '--km-ease': 'cubic-bezier(.2,0,0,1)',
-  '--km-ease-out': 'cubic-bezier(0,0,.2,1)',
+  '--km-composer-shadow': '0 5px 16px -4px rgba(0, 0, 0, 0.07)',
+  '--km-content-max-width': '768px',
+  '--km-ease': 'cubic-bezier(.25, 1, .3, 1)',
+  '--km-ease-out': 'cubic-bezier(.23, 1, .32, 1)',
   '--km-dur': '.15s',
   '--km-dur-mid': '.2s',
 })
 
 /**
- * 暗色色板 —— Kimi 的「深色优先」是产品主调，这套是重点。
- * 底色带蓝紫倾向（不是中性黑），主色提亮。
+ * 暗色色板 —— 官方 `:root.dark` 实测值。
+ * Kimi 暗色是**中性偏暖**（#121212 / #181817），不是蓝紫黑。
  */
 export const DARK = Object.freeze({
-  '--dsw-static-neutral-bluish-950': '#0E1020',
-  '--dsw-static-neutral-bluish-875': '#15172A',
-  '--dsw-static-neutral-bluish-850': '#1A1D33',
-  '--dsw-static-neutral-bluish-800': '#22263F',
-  '--dsw-static-neutral-bluish-750': '#2B304C',
-  '--dsw-static-neutral-bluish-700': '#363C5C',
-  '--dsw-static-neutral-bluish-600': '#454C70',
-  '--dsw-static-neutral-bluish-500': '#5C6488',
-  '--dsw-static-neutral-bluish-400': '#7D85A8',
-  '--dsw-static-neutral-bluish-300': '#A3AAC8',
-  '--dsw-static-neutral-bluish-200': '#C7CCE0',
-  '--dsw-static-neutral-bluish-150': '#2B304C',
-  '--dsw-static-neutral-bluish-100': '#363C5C',
-  '--dsw-static-neutral-bluish-75': '#22263F',
-  '--dsw-static-neutral-bluish-60': '#22263F',
-  '--dsw-static-neutral-bluish-50': '#E8EBF5',
-  '--dsw-static-neutral-bluish-00': '#F5F7FD',
-  '--dsw-static-neutral-bluish-1000': '#0A0B16',
+  '--dsw-static-neutral-bluish-950': '#181817',
+  '--dsw-static-neutral-bluish-875': '#1F1F1F',
+  '--dsw-static-neutral-bluish-850': '#1F1F1F',
+  '--dsw-static-neutral-bluish-800': '#292929',
+  '--dsw-static-neutral-bluish-750': '#333333',
+  '--dsw-static-neutral-bluish-700': '#4D4D4D',
+  '--dsw-static-neutral-bluish-600': '#5C5C5C',
+  '--dsw-static-neutral-bluish-500': '#767676',
+  '--dsw-static-neutral-bluish-400': '#9E9E9E',
+  '--dsw-static-neutral-bluish-300': '#C2C2C2',
+  '--dsw-static-neutral-bluish-200': '#DEDEDE',
+  '--dsw-static-neutral-bluish-150': '#333333',
+  '--dsw-static-neutral-bluish-100': '#4D4D4D',
+  '--dsw-static-neutral-bluish-75': '#292929',
+  '--dsw-static-neutral-bluish-60': '#292929',
+  '--dsw-static-neutral-bluish-50': '#FFFFFF',
+  '--dsw-static-neutral-bluish-00': '#000000',
+  '--dsw-static-neutral-bluish-1000': '#0A0A0A',
 
-  '--dsw-alias-bg-base': '#0E1020',
-  '--dsw-alias-bg-layer-1': '#15172A',
-  '--dsw-alias-bg-layer-2': '#1A1D33',
-  '--dsw-alias-bg-layer-3': '#22263F',
-  '--dsw-alias-bg-layer-4': '#2B304C',
-  '--dsw-alias-bg-overlay': '#1A1D33',
-  '--dsw-alias-bg-module-platform': '#22263F',
-  '--dsw-alias-bg-multi-select': 'rgba(123, 140, 255, 0.2)',
-  '--dsw-alias-bg-l1': '#15172A',
-  '--dsw-alias-bg-l2': '#1A1D33',
-  '--dsw-alias-background-secondary': '#1A1D33',
-  '--dsw-alias-bg-document-preview': '#15172A',
-  '--dsw-alias-bg-document-selection': 'rgba(123, 140, 255, 0.36)',
+  '--dsw-alias-bg-base': '#181817',
+  '--dsw-alias-bg-layer-1': '#121212',
+  '--dsw-alias-bg-layer-2': '#1F1F1F',
+  '--dsw-alias-bg-layer-3': '#292929',
+  '--dsw-alias-bg-layer-4': '#4D4D4D',
+  '--dsw-alias-bg-overlay': '#1F1F1F',
+  '--dsw-alias-bg-module-platform': '#292929',
+  '--dsw-alias-bg-multi-select': 'rgba(26, 136, 255, 0.2)',
+  '--dsw-alias-bg-l1': '#121212',
+  '--dsw-alias-bg-l2': '#1F1F1F',
+  '--dsw-alias-background-secondary': '#1F1F1F',
+  '--dsw-alias-bg-document-preview': '#1F1F1F',
+  '--dsw-alias-bg-document-selection': 'rgba(26, 136, 255, 0.32)',
   '--dsw-alias-bg-skeleton': 'rgba(255, 255, 255, 0.05)',
-  '--dsw-alias-bg-mask-1': 'rgba(0, 0, 0, 0.52)',
+  '--dsw-alias-bg-mask-1': 'rgba(0, 0, 0, 0.5)',
   '--dsw-alias-bg-mask-2': 'rgba(0, 0, 0, 0.24)',
   '--dsw-alias-bg-mask-3': 'rgba(0, 0, 0, 0.6)',
   '--dsw-alias-bg-mask-photo': 'rgba(0, 0, 0, 0.88)',
-  '--dsw-alias-bg-mask-drop': 'rgba(26, 29, 51, 0.72)',
+  '--dsw-alias-bg-mask-drop': 'rgba(31, 31, 31, 0.72)',
 
-  '--dsw-alias-border-l1': 'rgba(255, 255, 255, 0.06)',
-  '--dsw-alias-border-l2': 'rgba(255, 255, 255, 0.1)',
-  '--dsw-alias-border-subtle': 'rgba(255, 255, 255, 0.1)',
-  '--dsw-alias-border-l2-darkmode-thin': 'rgba(255, 255, 255, 0.07)',
-  '--dsw-alias-border-l3': 'rgba(255, 255, 255, 0.14)',
-  '--dsw-alias-border-l4': 'rgba(255, 255, 255, 0.18)',
-  '--dsw-alias-border-inverted': 'rgba(255, 255, 255, 0.06)',
-  '--dsw-alias-border-inverted2': 'rgba(255, 255, 255, 0.1)',
-  '--dsw-alias-separator-primary': 'rgba(255, 255, 255, 0.1)',
+  '--dsw-alias-border-l1': '#FFFFFF0F',
+  '--dsw-alias-border-l2': '#FFFFFF1F',
+  '--dsw-alias-border-subtle': '#FFFFFF1F',
+  '--dsw-alias-border-l2-darkmode-thin': '#FFFFFF17',
+  '--dsw-alias-border-l3': '#FFFFFF2E',
+  '--dsw-alias-border-l4': '#FFFFFF40',
+  '--dsw-alias-border-inverted': '#FFFFFF0D',
+  '--dsw-alias-border-inverted2': '#FFFFFF1F',
+  '--dsw-alias-separator-primary': '#FFFFFF1F',
 
-  '--dsw-alias-label-primary': '#E8EBF5',
-  '--dsw-alias-label-primary-foreground': '#0E1020',
-  '--dsw-alias-label-primary-inverted': '#14162E',
-  '--dsw-alias-label-primary-dimmed': 'rgba(232, 235, 245, 0.6)',
-  '--dsw-alias-label-primary-bluish': '#8B96FF',
-  '--dsw-alias-label-secondary': 'rgba(232, 235, 245, 0.64)',
-  '--dsw-alias-label-tertiary': 'rgba(232, 235, 245, 0.48)',
-  '--dsw-alias-label-caption': 'rgba(232, 235, 245, 0.38)',
-  '--dsw-alias-label-dimmed': 'rgba(232, 235, 245, 0.3)',
-  '--dsw-alias-label-quaternary': 'rgba(232, 235, 245, 0.32)',
+  '--dsw-alias-label-primary': '#FFFFFFD6',
+  '--dsw-alias-label-primary-foreground': '#121212',
+  '--dsw-alias-label-primary-inverted': '#000000',
+  '--dsw-alias-label-primary-dimmed': 'rgba(255, 255, 255, 0.6)',
+  '--dsw-alias-label-primary-bluish': '#1A88FF',
+  '--dsw-alias-label-secondary': '#FFFFFF8F',
+  '--dsw-alias-label-tertiary': '#FFFFFF6B',
+  '--dsw-alias-label-caption': '#FFFFFF42',
+  '--dsw-alias-label-dimmed': '#FFFFFF42',
+  '--dsw-alias-label-quaternary': '#FFFFFF42',
   '--dsw-alias-label-error': '#FF6B70',
   '--dsw-alias-label-shimmer': 'rgba(255, 255, 255, 0.42)',
-  '--dsw-alias-label-document-preview': '#A3AAC8',
-  '--dsw-alias-menu-icon': 'rgba(232, 235, 245, 0.64)',
+  '--dsw-alias-label-document-preview': '#C2C2C2',
+  '--dsw-alias-menu-icon': '#FFFFFF8F',
 
-  '--dsw-alias-brand-primary': '#7B8CFF',
-  '--dsw-alias-brand-primary-invert': '#0E1020',
-  '--dsw-alias-brand-text': '#8B96FF',
-  '--dsw-alias-brand-primary-new-colorprimary-new-color': '#7B8CFF',
-  '--dsw-alias-state-business-primary': '#7B8CFF',
-  '--dsw-alias-state-business-tertiary': 'rgba(123, 140, 255, 0.16)',
-  '--dsw-alias-button-primary-fill': '#6E7BFF',
-  '--dsw-alias-button-primary-hover': '#7F8BFF',
-  '--dsw-alias-button-primary-dimmed': 'rgba(123, 140, 255, 0.24)',
-  '--dsw-alias-button-contrast-fill': '#F5F7FD',
-  '--dsw-alias-button-elevated-fill': '#1A1D33',
-  '--dsw-alias-button-floating-fill': '#1A1D33',
-  '--dsw-alias-button-floating-hover': '#22263F',
-  '--dsw-alias-button-ghost-active-fill': 'rgba(123, 140, 255, 0.16)',
-  '--dsw-alias-button-ghost-active-hover': 'rgba(123, 140, 255, 0.24)',
-  '--dsw-alias-button-ghost-active-border': 'rgba(123, 140, 255, 0.4)',
-  '--dsw-alias-button-info-fill': '#7B8CFF',
-  '--dsw-alias-button-info-hover': '#8B96FF',
-  '--dsw-alias-button-tool-bar-fill': 'rgba(125, 133, 168, 0.5)',
-  '--dsw-alias-button-tool-bar-fill-invisible': 'rgba(69, 76, 112, 0.36)',
-  '--dsw-alias-button-tool-bar-hover': 'rgba(125, 133, 168, 0.62)',
+  '--dsw-alias-brand-primary': '#1A88FF',
+  '--dsw-alias-brand-primary-invert': '#121212',
+  '--dsw-alias-brand-text': '#1A88FF',
+  '--dsw-alias-brand-primary-new-colorprimary-new-color': '#1A88FF',
+  '--dsw-alias-state-business-primary': '#1A88FF',
+  '--dsw-alias-state-business-tertiary': 'rgba(26, 136, 255, 0.16)',
+  '--dsw-alias-button-primary-fill': '#1A88FF',
+  '--dsw-alias-button-primary-hover': '#258EFF',
+  '--dsw-alias-button-primary-dimmed': 'rgba(26, 136, 255, 0.24)',
+  '--dsw-alias-button-contrast-fill': '#FFFFFF',
+  '--dsw-alias-button-elevated-fill': '#1F1F1F',
+  '--dsw-alias-button-floating-fill': '#1F1F1F',
+  '--dsw-alias-button-floating-hover': '#292929',
+  '--dsw-alias-button-ghost-active-fill': '#FFFFFF0D',
+  '--dsw-alias-button-ghost-active-hover': '#FFFFFF1A',
+  '--dsw-alias-button-ghost-active-border': 'rgba(26, 136, 255, 0.32)',
+  '--dsw-alias-button-info-fill': '#1A88FF',
+  '--dsw-alias-button-info-hover': '#258EFF',
+  '--dsw-alias-button-tool-bar-fill': 'rgba(158, 158, 158, 0.5)',
+  '--dsw-alias-button-tool-bar-fill-invisible': 'rgba(92, 92, 92, 0.36)',
+  '--dsw-alias-button-tool-bar-hover': 'rgba(158, 158, 158, 0.62)',
 
-  '--dsw-alias-interactive-bg-hover': 'rgba(255, 255, 255, 0.05)',
-  '--dsw-alias-interactive-bg-hover-solid': '#22263F',
-  '--dsw-alias-interactive-bg-active': 'rgba(123, 140, 255, 0.16)',
-  '--dsw-alias-interactive-bg-hover-accent': 'rgba(123, 140, 255, 0.16)',
+  '--dsw-alias-interactive-bg-hover': '#FFFFFF0D',
+  '--dsw-alias-interactive-bg-hover-solid': '#1F1F1F',
+  '--dsw-alias-interactive-bg-active': '#FFFFFF1A',
+  '--dsw-alias-interactive-bg-hover-accent': 'rgba(26, 136, 255, 0.16)',
   '--dsw-alias-interactive-bg-hover-danger': 'rgba(255, 107, 112, 0.12)',
-  '--dsw-alias-fill-l1': 'rgba(255, 255, 255, 0.045)',
-  '--dsw-alias-fill-l2': 'rgba(255, 255, 255, 0.075)',
-  '--dsw-alias-fill-tertiary': 'rgba(255, 255, 255, 0.075)',
-  '--dsw-alias-fill-tsp-secondary': 'rgba(255, 255, 255, 0.045)',
+  '--dsw-alias-fill-l1': '#FFFFFF0D',
+  '--dsw-alias-fill-l2': '#FFFFFF1A',
+  '--dsw-alias-fill-tertiary': '#FFFFFF2E',
+  '--dsw-alias-fill-tsp-secondary': '#FFFFFF0D',
 
   '--dsw-static-green-500': '#4ADE80',
   '--dsw-static-green-400': '#4ADE80',
@@ -466,38 +487,39 @@ export const DARK = Object.freeze({
   '--dsw-alias-state-warn-secondary': '#FFA640',
   '--dsw-alias-state-warn-label': '#FFA640',
   '--dsw-alias-state-warn-tertiary': 'rgba(255, 166, 64, 0.16)',
-  '--dsw-alias-state-idle-primary': '#5C6488',
+  '--dsw-alias-state-idle-primary': '#767676',
 
-  '--dsw-static-deepseek-500': '#7B8CFF',
-  '--dsw-static-deepseek-450': '#7B8CFF',
-  '--dsw-static-deepseek-400': '#7B8CFF',
-  '--dsw-static-deepseek-600': '#8B96FF',
-  '--dsw-static-deepseek-800': 'rgba(123, 140, 255, 0.2)',
-  '--dsw-static-deepseek-100': 'rgba(123, 140, 255, 0.14)',
-  '--dsw-static-deepseek-50': 'rgba(123, 140, 255, 0.08)',
-  '--dsw-static-deepseek-200': 'rgba(123, 140, 255, 0.2)',
-  '--dsw-static-deepseek-300': 'rgba(123, 140, 255, 0.3)',
-  '--dsw-alias-link': '#8B96FF',
-  '--dsw-alias-label-deep-diving': '#8B96FF',
-  '--dsw-alias-label-deep-diving-shimmer': 'rgba(123, 140, 255, 0.3)',
-  '--dsw-static-blue-500': '#7B8CFF',
-  '--dsw-static-blue-450': '#7B8CFF',
-  '--dsw-static-blue-400': '#9AA6FF',
-  '--dsw-static-blue-300': '#B3BCFF',
-  '--dsw-static-blue-100': 'rgba(123, 140, 255, 0.16)',
+  '--dsw-static-deepseek-500': '#1A88FF',
+  '--dsw-static-deepseek-450': '#1A88FF',
+  '--dsw-static-deepseek-400': '#1A88FF',
+  '--dsw-static-deepseek-600': '#258EFF',
+  '--dsw-static-deepseek-800': 'rgba(26, 136, 255, 0.2)',
+  '--dsw-static-deepseek-100': 'rgba(26, 136, 255, 0.14)',
+  '--dsw-static-deepseek-50': 'rgba(26, 136, 255, 0.08)',
+  '--dsw-static-deepseek-200': 'rgba(26, 136, 255, 0.2)',
+  '--dsw-static-deepseek-300': 'rgba(26, 136, 255, 0.3)',
+  // --Others-LinkBlue dark #6f88aa 实测
+  '--dsw-alias-link': '#6F88AA',
+  '--dsw-alias-label-deep-diving': '#1A88FF',
+  '--dsw-alias-label-deep-diving-shimmer': 'rgba(26, 136, 255, 0.3)',
+  '--dsw-static-blue-500': '#1A88FF',
+  '--dsw-static-blue-450': '#1A88FF',
+  '--dsw-static-blue-400': '#4DA0FF',
+  '--dsw-static-blue-300': '#80BBFF',
+  '--dsw-static-blue-100': 'rgba(26, 136, 255, 0.16)',
 
-  '--dsw-alias-markdown-code-block': '#15172A',
-  '--dsw-alias-markdown-code-block-banner': '#1A1D33',
-  '--dsw-alias-markdown-inline-code': 'rgba(123, 140, 255, 0.14)',
-  '--dsw-alias-markdown-code-editor-bg': '#0A0B16',
-  '--dsw-alias-markdown-code-editor-fg': '#E8EBF5',
-  '--dsw-alias-markdown-tag': '#2B304C',
-  '--dsw-alias-markdown-citation': '#22263F',
-  '--dsw-alias-markdown-placeholder': '#1A1D33',
-  '--dsw-alias-markdown-code-segment-selected': '#1A1D33',
-  '--dsw-alias-markdown-code-segment-unselected': '#15172A',
-  '--dsw-alias-turn-trigger-bg': '#22263F',
-  '--dsw-alias-turn-trigger-bg-hover': 'rgba(255, 255, 255, 0.05)',
+  '--dsw-alias-markdown-code-block': '#121212',
+  '--dsw-alias-markdown-code-block-banner': '#1F1F1F',
+  '--dsw-alias-markdown-inline-code': 'rgba(255, 255, 255, 0.08)',
+  '--dsw-alias-markdown-code-editor-bg': '#0A0A0A',
+  '--dsw-alias-markdown-code-editor-fg': '#EDEDED',
+  '--dsw-alias-markdown-tag': '#292929',
+  '--dsw-alias-markdown-citation': '#1F1F1F',
+  '--dsw-alias-markdown-placeholder': '#1F1F1F',
+  '--dsw-alias-markdown-code-segment-selected': '#1F1F1F',
+  '--dsw-alias-markdown-code-segment-unselected': '#121212',
+  '--dsw-alias-turn-trigger-bg': '#1F1F1F',
+  '--dsw-alias-turn-trigger-bg-hover': '#FFFFFF0D',
   '--dsw-alias-code-diff-added': 'rgba(74, 222, 128, 0.12)',
   '--dsw-alias-code-diff-deleted': 'rgba(255, 107, 112, 0.12)',
   '--dsw-alias-file-diff-added-bg': '#16301F',
@@ -509,53 +531,53 @@ export const DARK = Object.freeze({
 
   '--dsw-alias-scrollbar-bg-l1': 'rgba(255, 255, 255, 0.1)',
   '--dsw-alias-scrollbar-bg-l2': 'rgba(255, 255, 255, 0.1)',
-  '--dsw-alias-scrollbar-hover-l1': 'rgba(232, 235, 245, 0.28)',
-  '--dsw-alias-scrollbar-hover-l2': 'rgba(232, 235, 245, 0.28)',
-  '--dsw-alias-toast-bg': '#1A1D33',
-  '--dsw-alias-toast-label': '#E8EBF5',
-  '--dsw-alias-tooltip-bg': '#2B304C',
-  '--dsw-alias-tooltip-label': '#F5F7FD',
-  '--dsw-alias-tooltip-key-bg': '#363C5C',
-  '--dsw-alias-menu-group-header-fill': 'rgba(21, 23, 42, 0.94)',
-  '--dsw-alias-switch-thumb': '#F5F7FD',
-  '--dsw-alias-settings-card-fill': '#1A1D33',
-  '--dsw-alias-settings-card-stroke': 'rgba(255, 255, 255, 0.1)',
-  '--dsw-alias-onboarding-accent': '#7B8CFF',
-  '--dsw-alias-onboarding-card-fill': '#1A1D33',
-  '--dsw-alias-onboarding-secondary-fill': '#22263F',
-  '--dsw-alias-onboarding-checkbox-border': 'rgba(255, 255, 255, 0.2)',
-  '--dsw-focus-ring-color': '#7B8CFF',
-  '--dsw-alias-icon-blue': '#7B8CFF',
+  '--dsw-alias-scrollbar-hover-l1': 'rgba(255, 255, 255, 0.3)',
+  '--dsw-alias-scrollbar-hover-l2': 'rgba(255, 255, 255, 0.3)',
+  '--dsw-alias-toast-bg': '#292929',
+  '--dsw-alias-toast-label': '#FFFFFFD6',
+  '--dsw-alias-tooltip-bg': '#292929',
+  '--dsw-alias-tooltip-label': '#FFFFFF',
+  '--dsw-alias-tooltip-key-bg': '#4D4D4D',
+  '--dsw-alias-menu-group-header-fill': 'rgba(18, 18, 18, 0.94)',
+  '--dsw-alias-switch-thumb': '#FFFFFF',
+  '--dsw-alias-settings-card-fill': '#1F1F1F',
+  '--dsw-alias-settings-card-stroke': '#FFFFFF1F',
+  '--dsw-alias-onboarding-accent': '#1A88FF',
+  '--dsw-alias-onboarding-card-fill': '#1F1F1F',
+  '--dsw-alias-onboarding-secondary-fill': '#292929',
+  '--dsw-alias-onboarding-checkbox-border': '#FFFFFF2E',
+  '--dsw-focus-ring-color': '#1A88FF',
+  '--dsw-alias-icon-blue': '#1A88FF',
 
-  '--dsw-specific-sidebar-fill': '#12142A',
-  '--dsw-specific-sidebar-nav-item-active': 'rgba(123, 140, 255, 0.14)',
-  '--dsw-specific-sidebar-nav-item-active-accent': '#7B8CFF',
-  '--dsw-specific-bubble': 'rgba(123, 140, 255, 0.14)',
-  '--dsw-specific-bubble-highlight': 'rgba(123, 140, 255, 0.22)',
-  '--dsw-specific-input-major': '#1A1D33',
-  '--dsw-specific-login-input': '#1A1D33',
-  '--dsw-specific-selector': '#7B8CFF',
-  '--dsw-specific-tip': '#22263F',
-  '--dsw-specific-menu-item-hover': '#22263F',
-  '--dsw-specific-menu': '#1A1D33',
-  '--dsw-menu-surface-fill': 'rgba(26, 29, 51, 0.86)',
-  '--dsw-menu-backdrop-filter': 'blur(20px) saturate(160%)',
+  '--dsw-specific-sidebar-fill': '#181817',
+  '--dsw-specific-sidebar-nav-item-active': '#FFFFFF1A',
+  '--dsw-specific-sidebar-nav-item-active-accent': '#1A88FF',
+  '--dsw-specific-bubble': '#FFFFFF0D',
+  '--dsw-specific-bubble-highlight': '#FFFFFF1A',
+  '--dsw-specific-input-major': '#1F1F1F',
+  '--dsw-specific-login-input': '#1F1F1F',
+  '--dsw-specific-selector': '#1A88FF',
+  '--dsw-specific-tip': '#292929',
+  '--dsw-specific-menu-item-hover': '#292929',
+  '--dsw-specific-menu': '#1F1F1F',
+  '--dsw-menu-surface-fill': '#292929E6',
+  '--dsw-menu-backdrop-filter': 'blur(15px)',
 
-  '--km-primary': '#7B8CFF',
-  '--km-primary-hover': '#8B96FF',
-  '--km-primary-active': '#9AA6FF',
-  '--km-primary-soft': 'rgba(123, 140, 255, 0.14)',
-  '--km-primary-border': 'rgba(123, 140, 255, 0.4)',
-  '--km-gradient': 'linear-gradient(135deg, #8B96FF 0%, #6E7BFF 55%, #4A4FC8 100%)',
-  '--km-gradient-button': 'linear-gradient(135deg, #7B8CFF 0%, #5A5FE0 100%)',
-  '--km-user-bubble': 'rgba(123, 140, 255, 0.14)',
-  '--km-glass-blur': 'blur(20px) saturate(160%)',
-  '--km-glass-fill': 'rgba(26, 29, 51, 0.72)',
+  '--km-primary': '#1A88FF',
+  '--km-primary-hover': '#258EFF',
+  '--km-primary-active': '#3194FF',
+  '--km-primary-soft': 'rgba(26, 136, 255, 0.16)',
+  '--km-primary-border': 'rgba(26, 136, 255, 0.32)',
+  '--km-gradient': 'linear-gradient(135deg, #1a88ff 0%, #2f20ff 100%)',
+  '--km-gradient-button': 'linear-gradient(135deg, #1a88ff 0%, #167cf2 100%)',
+  '--km-user-bubble': '#FFFFFF0D',
+  '--km-glass-blur': 'blur(15px)',
+  '--km-glass-fill': '#292929E6',
   '--km-composer-radius': '24px',
-  '--km-composer-shadow': '0 8px 32px rgba(0, 0, 0, 0.4)',
-  '--km-content-max-width': '880px',
-  '--km-ease': 'cubic-bezier(.2,0,0,1)',
-  '--km-ease-out': 'cubic-bezier(0,0,.2,1)',
+  '--km-composer-shadow': '0 5px 16px -4px rgba(0, 0, 0, 0.4)',
+  '--km-content-max-width': '768px',
+  '--km-ease': 'cubic-bezier(.25, 1, .3, 1)',
+  '--km-ease-out': 'cubic-bezier(.23, 1, .32, 1)',
   '--km-dur': '.15s',
   '--km-dur-mid': '.2s',
 })
@@ -568,7 +590,7 @@ export const DARK = Object.freeze({
  *
  * 刻意不覆盖 `:focus-visible` 的 outline：DSH 用
  * `html[data-input-modality=pointer] body :focus-visible{outline-color:#0000}`
- * 实现「仅键盘才显示焦点环」。直接写 outline 会连鼠标点击也画出焦点环。
+ * 实现「仅键盘才显示焦点环」。
  */
 export const STRUCTURE_CSS = `
 /* 原生控件跟随皮肤而不是跟随操作系统。 */
@@ -579,26 +601,26 @@ export const STRUCTURE_CSS = `
 :where(body){font-family:var(--dsw-font-family);font-variant-numeric:tabular-nums}
 :where(button,input,select,textarea){font-family:inherit}
 
-/* 输入框外壳：Kimi 的 24px 大圆角 + 柔和浮起阴影。 */
+/* 输入框外壳：Kimi 实测 24px 圆角 / max-width 768px / 0 5px 16px -4px #00000012。 */
 [data-composer-card]{
   border-radius:var(--km-composer-radius)!important;
   box-shadow:var(--km-composer-shadow)!important;
-  border:1px solid var(--dsw-alias-border-l2)!important;
+  border:1px solid var(--dsw-alias-border-l1)!important;
   transition:box-shadow var(--km-dur-mid) var(--km-ease),border-color var(--km-dur) var(--km-ease-out)!important;
 }
 [data-composer-card]:focus-within{
-  border-color:var(--km-primary)!important;
-  box-shadow:0 0 0 3px var(--km-primary-soft),var(--km-composer-shadow)!important;
+  border-color:var(--km-primary-border)!important;
+  box-shadow:0 4px 12px rgba(0,0,0,0.03),var(--km-composer-shadow)!important;
 }
 
-/* 消息气泡：Kimi 的 18px 圆角。只统一圆角，不改底色/对齐 ——
+/* 消息气泡：Kimi 实测 12px 圆角。只统一圆角，不改底色/对齐 ——
    宿主没有角色区分属性，猜错会伤到 AI 回答。 */
-[data-message-bubble]{border-radius:var(--dsw-radius-lg)!important}
+[data-message-bubble]{border-radius:var(--dsw-radius-md)!important}
 
-/* 快捷胶囊：圆角药丸 + 玻璃质感（Kimi 的显著特征）。 */
+/* 快捷胶囊：圆角药丸 + Kimi 的玻璃质感（blur(15px) 是其最高频参数）。 */
 [data-composer-chip]{
   border-radius:var(--dsw-radius-full)!important;
-  border:1px solid var(--dsw-alias-border-l2)!important;
+  border:1px solid var(--dsw-alias-border-l1)!important;
   background:var(--km-glass-fill)!important;
   backdrop-filter:var(--km-glass-blur)!important;
   -webkit-backdrop-filter:var(--km-glass-blur)!important;
@@ -616,25 +638,25 @@ export const STRUCTURE_CSS = `
   background:var(--km-primary-soft)!important;
 }
 
-/* 主按钮（发送键）：品牌渐变。 */
+/* 主按钮（发送键）：品牌蓝实底（Kimi 的按钮是纯色，不是渐变）。 */
 [data-composer-card] button[class*="primary"],
 [data-composer-card] [data-composer-command]{
-  background:var(--km-gradient-button)!important;
+  background:var(--km-primary)!important;
   color:#fff!important;
   border:0!important;
   border-radius:var(--dsw-radius-full)!important;
 }
 
-/* 浮层：玻璃质感（菜单、对话框）。 */
+/* 浮层：玻璃质感（Kimi 实测 blur(15px) + 90% 不透明底）。 */
 [data-menu-field],[data-context-menu]{
   backdrop-filter:var(--km-glass-blur)!important;
   -webkit-backdrop-filter:var(--km-glass-blur)!important;
 }
 
-/* 代码块与引用块：统一大圆角、禁止横向溢出。 */
-[data-code-block-banner]{border-radius:var(--dsw-radius-lg) var(--dsw-radius-lg) 0 0!important}
+/* 代码块与引用块：统一圆角。 */
+[data-code-block-banner]{border-radius:var(--dsw-radius-md) var(--dsw-radius-md) 0 0!important}
 [data-conversation-scroll] pre,
-[data-conversation-scroll] blockquote{border-radius:var(--dsw-radius-lg)!important}
+[data-conversation-scroll] blockquote{border-radius:var(--dsw-radius-md)!important}
 
 /* 尊重系统的减少动效偏好。 */
 @media (prefers-reduced-motion: reduce){
@@ -657,7 +679,7 @@ export function renderSkinCss() {
   ].join('')
   return [
     `/* dsh-kimi-ui — Kimi 风格皮肤 v${SKIN_VERSION} · inspired-by, 非官方 */`,
-    `/* 本版色值为视觉归纳（推导），非官方 CSS 令牌实测值。详见 docs/DESIGN.md */`,
+    `/* 色值来源：Kimi 官方 CSS bundle（statics.moonshot.cn/kimi-web/assets）实测。渐变与部分中间态为推导。详见 docs/DESIGN.md */`,
     renderTokenBlock(LIGHT_SELECTOR, LIGHT),
     renderTokenBlock(DARK_SELECTOR, DARK),
     structural,

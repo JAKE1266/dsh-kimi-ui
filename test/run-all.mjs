@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * dsh-kimi-ui — 自包含验证套件（零依赖）· v1.0.0
+ * dsh-kimi-ui — 自包含验证套件（零依赖）· v1.1.0
  *
  * 覆盖：
  *   1. 产物存在且是有效的 JS（用 vm 在沙箱里真实执行一遍）
@@ -221,9 +221,9 @@ function makeDomStub() {
   assert.ok(lightKeys.length >= 200, `令牌数量偏少 (${lightKeys.length})`)
   ok(`亮/暗令牌键集合完全一致（${lightKeys.length} 个语义令牌）`)
 
-  assert.equal(css.t.LIGHT['--dsw-alias-brand-primary'], '#5A5FE0', '亮色主色必须是实测 #5A5FE0')
-  assert.equal(css.t.DARK['--dsw-alias-brand-primary'], '#7B8CFF', '暗色主色必须是实测 #7B8CFF')
-  ok('亮色 #5A5FE0 / 暗色 #7B8CFF（本版为视觉归纳，非官方实测）')
+  assert.equal(css.t.LIGHT['--dsw-alias-brand-primary'], '#1783FF', '亮色主色必须是实测 #1783FF')
+  assert.equal(css.t.DARK['--dsw-alias-brand-primary'], '#1A88FF', '暗色主色必须是实测 #1A88FF')
+  ok('亮色 #1783FF / 暗色 #1A88FF（Kimi 官方 CSS 实测）')
 
   for (const [paletteName, palette] of [['LIGHT', css.t.LIGHT], ['DARK', css.t.DARK], ['STRUCTURAL', css.t.STRUCTURAL]]) {
     for (const [key, value] of Object.entries(palette)) {
@@ -241,7 +241,7 @@ function makeDomStub() {
     assert.equal(head.children.length, 1, '第一次安装应插入一个 style')
     assert.equal(head.children[0].dataset.plugin, 'dsh-kimi-ui')
     assert.equal(head.children[0].dataset.pluginCss, 'dsh-kimi-ui/skin.css')
-    assert.equal(rootAttrs.get('data-dsh-kimi-skin'), '1.0.0')
+    assert.equal(rootAttrs.get('data-dsh-kimi-skin'), '1.1.0')
     const first = head.children[0]
     const dispose2 = mod.installSkin(doc)
     assert.equal(head.children.length, 1, '重复安装不得重复插入 style')
@@ -431,7 +431,7 @@ function makeDomStub() {
     ]) {
       assert.ok(pkg.dsh.client.inject.includes(name), `dsh.client.inject 必须前置声明 ${name}`)
     }
-    assert.equal(pkg.version, '1.0.0', '版本号应与本次升级一致')
+    assert.equal(pkg.version, '1.1.0', '版本号应与本次升级一致')
     assert.equal(pkg.dsh.bundle.patch, './cordis.patch.yml')
     assert.ok(existsSync(join(root, pkg.exports['.'].default)), 'exports["."] 指向的文件不存在')
     assert.ok(existsSync(join(root, pkg.exports['./client'].default)), 'exports["./client"] 指向的文件不存在')

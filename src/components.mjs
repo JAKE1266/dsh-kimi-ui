@@ -17,7 +17,7 @@
  *   - 每个 slots.inject 都单独 try/catch，某个插槽不存在/已声明不影响其余；
  *   - 组件内部不访问可能为空的 ctx 服务，全部用可选链 + 默认值。
  *
- * 关于 priority：-1 是社区 dsh-doubao-ui 已验证的写法，用来盖掉
+ * 关于 priority：-1 是社区皮肤已验证的写法，用来盖掉
  * 官方 dsh-client-ui-brand-official（默认优先级 0）的占位。
  */
 
@@ -64,12 +64,12 @@ const QUICK_ACTIONS = [
 const COMPONENT_CSS = `
 .km-mark{display:block;flex:none;border-radius:32%;user-select:none;-webkit-user-drag:none}
 .km-brand{display:inline-flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;font-weight:600}
-.km-hero-mark{display:block;border-radius:34%;box-shadow:0 8px 24px rgba(90,95,224,.28)}
+.km-hero-mark{display:block;border-radius:34%;box-shadow:0 8px 24px rgba(23,131,255,.28)}
 .km-quick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%;padding:2px 0 0;box-sizing:border-box}
 .km-chip{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 14px;border:1px solid var(--dsw-alias-border-l2,rgba(0,0,0,.12));border-radius:9999px;background:var(--dsw-alias-bg-layer-1,#fff);color:var(--dsw-alias-label-secondary,rgba(0,0,0,.85));font:inherit;font-size:13px;line-height:20px;cursor:pointer;transition:background-color var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1)),border-color var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1)),color var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1)),transform var(--km-dur,.15s) var(--km-ease-out,cubic-bezier(0,0,.2,1))}
-.km-chip:hover{border-color:var(--km-primary-border,rgba(123,140,255,.4));color:var(--km-primary,#5A5FE0);background:var(--km-primary-soft,rgba(90,95,224,.1));transform:translateY(-1px)}
+.km-chip:hover{border-color:var(--km-primary-border,rgba(23,131,255,.4));color:var(--km-primary,#1783FF);background:var(--km-primary-soft,rgba(23,131,255,.1));transform:translateY(-1px)}
 .km-chip:active{transform:translateY(0)}
-.km-chip:focus-visible{outline:2px solid var(--dsw-focus-ring-color,#5A5FE0);outline-offset:2px}
+.km-chip:focus-visible{outline:2px solid var(--dsw-focus-ring-color,#1783FF);outline-offset:2px}
 .km-about{max-width:760px;display:flex;flex-direction:column;gap:18px;color:var(--dsw-alias-label-primary,#000);font:14px/1.6 var(--dsw-font-family,system-ui)}
 .km-about h2{margin:0;font-size:20px;font-weight:600;line-height:28px}
 .km-about h3{margin:0 0 6px;font-size:15px;font-weight:600}
@@ -77,9 +77,9 @@ const COMPONENT_CSS = `
 .km-about-card{border:1px solid var(--dsw-alias-border-l2,rgba(0,0,0,.12));border-radius:var(--dsw-radius-lg,16px);padding:16px;background:var(--dsw-alias-bg-layer-1,#fff);display:flex;flex-direction:column;gap:8px}
 .km-about-head{display:flex;align-items:center;gap:12px}
 .km-about-head img{width:40px;height:40px;border-radius:32%;flex:none}
-.km-about-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:9999px;font-size:12px;line-height:18px;background:var(--km-primary-soft,rgba(90,95,224,.1));color:var(--km-primary,#5A5FE0);border:1px solid var(--km-primary-border,rgba(123,140,255,.4))}
+.km-about-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:9999px;font-size:12px;line-height:18px;background:var(--km-primary-soft,rgba(23,131,255,.1));color:var(--km-primary,#1783FF);border:1px solid var(--km-primary-border,rgba(23,131,255,.4))}
 .km-about-tip{margin:0;font-size:12.5px;color:var(--dsw-alias-label-tertiary,rgba(0,0,0,.5))}
-.km-about a{color:var(--km-primary,#5A5FE0);text-decoration:none}
+.km-about a{color:var(--km-primary,#1783FF);text-decoration:none}
 .km-about a:hover{text-decoration:underline}
 @media (prefers-reduced-motion: reduce){.km-chip{transition:none}}
 `.trim()
@@ -234,12 +234,12 @@ function AboutSection() {
         jsx('img', { src: markDataUrl(), alt: '', 'aria-hidden': 'true' }),
         jsxs('div', { children: [
           jsx('h2', { children: 'Kimi 风格皮肤' }),
-          jsx('span', { className: 'km-about-badge', children: 'dsh-kimi-ui · v1.0.0' }),
+          jsx('span', { className: 'km-about-badge', children: 'dsh-kimi-ui · v1.1.0' }),
         ] }),
       ] }),
       jsxs('div', { className: 'km-about-card', children: [
         jsx('h3', { children: '这是什么' }),
-        jsx('p', { children: '给 DeepSeek Harness Web 换一套 Kimi 风格界面：深蓝紫渐变主色、深色优先的表面层级、玻璃质感面板与大圆角几何，外加品牌标记与首页快捷入口。明暗双主题跟随宿主设置。' }),
+        jsx('p', { children: '给 DeepSeek Harness Web 换一套 Kimi 风格界面：Kimi 品牌蓝主色、深色优先的表面层级、玻璃质感面板与大圆角几何，外加品牌标记与首页快捷入口。明暗双主题跟随宿主设置。' }),
       ] }),
       jsxs('div', { className: 'km-about-card', children: [
         jsx('h3', { children: '能力边界' }),

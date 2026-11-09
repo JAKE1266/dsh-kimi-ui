@@ -9,23 +9,37 @@
 >
 > The plugin changes **only the interface**: no models, no session data, no network, no tools, no file I/O.
 
-## ⚠️ Honest note on the colors
+## Colors are measured from Kimi's shipped CSS
 
-**This release uses derived colors, not measured official tokens.**
+Every token traces to Kimi's official CSS bundle (`:root` / `:root.dark`):
 
-Kimi's Web client is JS-rendered and anti-scraping, so its CSS design tokens could not be reliably retrieved. Every color here is induced from the public interface and is labelled as derived in `src/tokens.mjs`, `docs/DESIGN.md`, the README and the in-app About page. The sibling [`dsh-doubao-ui`](https://github.com/JAKE1266/dsh-doubao-ui) plugin *does* use measured tokens from Doubao's shipped CSS bundle — the two differ in provenance, and this one does not claim otherwise.
+```
+https://statics.moonshot.cn/kimi-web/assets/Bd7TiIrN.css   (328 KB, token table)
+https://statics.moonshot.cn/kimi-web/assets/5Dx4H7G1.css   (body font + background)
+```
 
-If you can supply Kimi's real CSS token values, issues and PRs are very welcome.
+| Kimi token | Light | Dark |
+| --- | --- | --- |
+| `--Colors-KMBlue` | `#1783ff` | `#1a88ff` |
+| `--Bg-GroundPC` (page + sidebar) | `#fbfaf9` warm white | `#181817` |
+| `--Bg-Primary` / `--Bg-Secondary` | `#fff` / `#f5f5f5` | `#121212` / `#1f1f1f` |
+| `--Labels-Primary` | `#000000e6` | `#ffffffd6` |
+| `--Fills-F1` (bubble fill) | `#00000008` | `#ffffff0d` |
+| `--chat-input-radius` | **24px** | same |
+| Bubble radius | **12px** | same |
+| Glass | `blur(15px)` | same |
+
+**One derived item:** Kimi has **no** official brand-gradient variable — grepping all 41 CSS bundles found `gradient` zero times in the HTML, and the only blue-violet gradient on the site is the code-card background. This plugin's `--km-gradient` composes brand blue with that deep violet and is labelled derived, as are the 15px font baseline and a few intermediate opacities. See [`docs/DESIGN.md`](docs/DESIGN.md) §6 for the full list.
 
 ## What it does
 
 ### Layer 1 — skin (pure CSS token overrides)
 
-- Deep blue-violet brand `#5A5FE0` on cool blue-grey neutrals; replaces DSH's full `--dsw-alias-*` / `--dsw-static-*` / `--dsw-specific-*` set.
-- **Dark-first** palette: base `#0E1020`, layers `#15172A` / `#1A1D33` / `#22263F`, brand lifted to `#7B8CFF`.
-- **Glassmorphism** on menus, dialogs and composer chips (`backdrop-filter: blur(20px) saturate(160%)`).
-- Large radii: 16px bubbles, 24px composer and panels, `9999px` pills.
-- Composer focus ring, brand-gradient send button, unified code-block radii.
+- Kimi brand blue `#1783ff` on warm-white / neutral surfaces; replaces DSH's full `--dsw-alias-*` / `--dsw-static-*` / `--dsw-specific-*` set.
+- Dark theme is Kimi's **neutral-warm** `#121212` / `#181817` — not blue-black.
+- **Glassmorphism** on menus, dialogs and composer chips (`backdrop-filter: blur(15px)`, Kimi's most frequent value).
+- Measured geometry: 12px bubbles, **24px** composer, 24px panels, `9999px` pills.
+- Composer shadow `0 5px 16px -4px #00000012` + focus ring; unified code-block radii.
 - Respects `prefers-reduced-motion`; keeps DSH's keyboard-only focus ring.
 
 ### Layer 2 — components (declarative React slots)
@@ -63,7 +77,7 @@ dsh plugin --profile desktop add link:$(pwd)
 
 Replace `desktop` with the profile actually running `dsh web`.
 
-**Activate:** restart DSH Web, then hard-refresh (`Ctrl+Shift+R`). `<html>` should carry `data-dsh-kimi-skin="1.0.0"`, and `<head>` should contain both `.../skin.css"` and `.../components.css"` style tags.
+**Activate:** restart DSH Web, then hard-refresh (`Ctrl+Shift+R`). `<html>` should carry `data-dsh-kimi-skin="1.1.0"`, and `<head>` should contain both `.../skin.css"` and `.../components.css"` style tags.
 
 **Disable / remove:**
 

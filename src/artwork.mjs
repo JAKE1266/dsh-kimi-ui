@@ -5,16 +5,17 @@
  * 是一个**自创的「月牙 + 星点」标记**，呼应 Kimi（月之暗面 Moonshot）的
  * 「月」意象，但形状与构图均为本项目原创，不是任何 logo 的临摹。
  *
- * 形状语言：深蓝紫渐变圆角方底 + 一弯月牙 + 两点星芒。渐变取自实测品牌色。
+ * 形状语言：品牌蓝渐变圆角方底 + 一弯月牙 + 两点星芒。渐变取自实测品牌色
+ * （--Colors-KMBlue #1783ff 的亮/暗两档）。
  */
 
 /** 侧栏 / hero 共用的方形标记（viewBox 0 0 48 48）。 */
 export const MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="">
   <defs>
     <linearGradient id="km-g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7B8CFF"/>
-      <stop offset="0.55" stop-color="#5A5FE0"/>
-      <stop offset="1" stop-color="#3D3FA8"/>
+      <stop offset="0" stop-color="#4DA0FF"/>
+      <stop offset="0.55" stop-color="#1783FF"/>
+      <stop offset="1" stop-color="#0F5FD9"/>
     </linearGradient>
   </defs>
   <rect x="2" y="2" width="44" height="44" rx="15" fill="url(#km-g)"/>
